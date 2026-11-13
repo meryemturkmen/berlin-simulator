@@ -162,5 +162,29 @@
       "heading": -1.45,
       "mode": "ground"
     }
+  ],
+  "npcs": [
+    {
+      "npc": "jule",
+      "x": -5,
+      "z": 13,
+      "heading": -2.6,
+      "pose": "play_guitar"
+    },
+    {
+      "npc": "tarek",
+      "x": 22.51,
+      "z": -22.21,
+      "heading": -1.1,
+      "pose": "sit_ground"
+    },
+    {
+      "npc": "micha",
+      "x": -43,
+      "z": -17.5,
+      "heading": 1.9,
+      "pose": "stand",
+      "companion": "dog"
+    }
   ]
 }

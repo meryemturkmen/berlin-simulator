@@ -58,6 +58,18 @@ const de = {
   "interact.sit": "Hinsetzen",
   "interact.stand": "Aufstehen",
   "interact.talk": "Sprechen",
+  "chat.placeholder": "Sag etwas …",
+  "chat.send": "Senden",
+  "chat.close": "Gespräch beenden",
+  "chat.inputLabel": "Deine Nachricht an {name}",
+  "chat.typing": "{name} überlegt …",
+  "chat.you": "Du",
+  "chat.rate_limited_user":
+    "Die Leute im Kiez brauchen mal 'ne Pause. Versuch's in einer Stunde noch mal.",
+  "chat.rate_limited_global":
+    "Heute war richtig viel los im Kiez, alle sind müde gequatscht. Komm morgen wieder!",
+  "chat.unavailable": "Gerade ist es zu laut zum Reden. Versuch's gleich noch mal.",
+  "album.unlocked": "Neues Erlebnis",
 } as const;
 
 export type MessageKey = keyof typeof de;
@@ -119,6 +131,17 @@ const en: Record<MessageKey, string> = {
   "interact.sit": "Sit down",
   "interact.stand": "Stand up",
   "interact.talk": "Talk",
+  "chat.placeholder": "Say something …",
+  "chat.send": "Send",
+  "chat.close": "End conversation",
+  "chat.inputLabel": "Your message to {name}",
+  "chat.typing": "{name} is thinking …",
+  "chat.you": "You",
+  "chat.rate_limited_user": "The neighborhood needs a little break. Try again in an hour.",
+  "chat.rate_limited_global":
+    "It's been a busy day around here and everyone is talked out. Come back tomorrow!",
+  "chat.unavailable": "It's too noisy to talk right now. Try again in a moment.",
+  "album.unlocked": "New experience",
 };
 
 export const messages: Record<Language, Record<MessageKey, string>> = { de, en };

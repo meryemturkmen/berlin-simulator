@@ -21,6 +21,13 @@ const CAMERA_MAX_DISTANCE = 9;
 const CAMERA_HEAD_HEIGHT = 1.45;
 const DOWN = { x: 0, y: -1, z: 0 };
 
+/** Frame-rate independent easing of an angle along the shortest arc. */
+function dampAngle(current: number, target: number, lambda: number, delta: number): number {
+  const difference =
+    THREE.MathUtils.euclideanModulo(target - current + Math.PI, Math.PI * 2) - Math.PI;
+  return current + difference * (1 - Math.exp(-lambda * delta));
+}
+
 interface PlayerProps {
   look: AvatarLook;
   spawn: { position: [number, number, number]; heading: number };
@@ -36,6 +43,8 @@ interface PlayerProps {
 export function Player({ look, spawn, heightAt }: PlayerProps) {
   const { world, rapier } = useRapier();
   const camera = useThree((state) => state.camera);
+  const size = useThree((state) => state.size);
+  const viewShift = useRef({ x: 0, y: 0 });
   const body = useRef<RapierRigidBody>(null);
   const visual = useRef<THREE.Group>(null);
   const poseRef = useRef(createPose());
@@ -132,6 +141,19 @@ export function Player({ look, spawn, heightAt }: PlayerProps) {
     input.lookPitch = 0;
     input.zoom = 0;
     if (!seat) cam.yaw -= move.x * 1.1 * delta;
+
+    // In a conversation: face the other person, camera over the shoulder.
+    const focus = runtime.focus;
+    if (focus) {
+      const toFocus = Math.atan2(
+        focus.x - runtime.player.position.x,
+        focus.z - runtime.player.position.z,
+      );
+      if (!seat) runtime.player.heading = dampAngle(runtime.player.heading, toFocus, 8, delta);
+      cam.yaw = dampAngle(cam.yaw, toFocus + Math.PI + 0.55, 5, delta);
+      cam.pitch = THREE.MathUtils.damp(cam.pitch, 0.16, 5, delta);
+      cam.distance = THREE.MathUtils.damp(cam.distance, 4.4, 5, delta);
+    }
 
     const position = rigidBody.translation();
     let nextX = position.x;
@@ -268,6 +290,23 @@ export function Player({ look, spawn, heightAt }: PlayerProps) {
       .copy(smoothedTarget.current)
       .addScaledVector(scratch.offset, cameraDistance.current);
     camera.lookAt(smoothedTarget.current);
+
+    // Keep the action visible next to (or above) an open panel.
+    const shift = viewShift.current;
+    shift.x = THREE.MathUtils.damp(shift.x, runtime.viewShift.x, 6, delta);
+    shift.y = THREE.MathUtils.damp(shift.y, runtime.viewShift.y, 6, delta);
+    if (Math.abs(shift.x) > 0.002 || Math.abs(shift.y) > 0.002) {
+      (camera as THREE.PerspectiveCamera).setViewOffset(
+        size.width,
+        size.height,
+        shift.x * size.width,
+        shift.y * size.height,
+        size.width,
+        size.height,
+      );
+    } else if ((camera as THREE.PerspectiveCamera).view?.enabled) {
+      (camera as THREE.PerspectiveCamera).clearViewOffset();
+    }
     runtime.ready = true;
   });
 

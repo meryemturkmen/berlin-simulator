@@ -6,6 +6,8 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { Suspense, useCallback, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
+import { ChatOverlay } from "@/components/chat/ChatOverlay";
+import { ExperienceToast } from "@/components/hud/ExperienceToast";
 import { Hud } from "@/components/hud/Hud";
 import { LoadingScreen } from "@/components/hud/LoadingScreen";
 import { getPlace, PLACES } from "@/content/places";
@@ -109,7 +111,13 @@ export default function Game() {
         </Canvas>
       )}
 
-      {phase === "playing" && <Hud place={place} />}
+      {phase === "playing" && (
+        <>
+          <Hud place={place} />
+          <ExperienceToast place={place} />
+          <ChatOverlay />
+        </>
+      )}
       <LoadingScreen place={place} factIndex={factIndex} visible={phase === "loading"} />
     </div>
   );

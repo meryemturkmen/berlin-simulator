@@ -14,6 +14,8 @@ import { runtime } from "@/game/runtime";
 import { usePlayer } from "@/game/store/player";
 import type { Place } from "@/lib/places/schema";
 import { terrainHeight } from "@/lib/places/terrain";
+import { getNpc } from "@/content/npcs";
+import { Npc } from "@/game/npc/Npc";
 import { createPlaceMaterials } from "./materials";
 import { Props } from "./Props";
 import { Benches, Lamps, Trees } from "./Scenery";
@@ -146,8 +148,25 @@ export default function PlaceScene({ place, shadows, treeDensity, onReady }: Pla
 
   // Keep the HUD prompt in sync with whatever is in reach.
   useFrame(() => {
-    const { seat, frozen } = usePlayer.getState();
+    const { seat, frozen, seatRequest } = usePlayer.getState();
     const { x, y, z } = runtime.player.position;
+    // An NPC invited the player to sit somewhere (e.g. on a picnic blanket).
+    if (seatRequest) {
+      usePlayer.getState().requestSeat(null);
+      const invited = place.seats.find((candidate) => candidate.id === seatRequest);
+      if (invited) {
+        usePlayer.getState().sit({
+          id: invited.id,
+          position: [
+            invited.x,
+            heightAt(invited.x, invited.z) + (invited.mode === "ground" ? 0.04 : 0),
+            invited.z,
+          ],
+          heading: invited.heading,
+          mode: invited.mode,
+        });
+      }
+    }
     const next = seat || frozen ? null : findInteractable(x, y, z);
     if (next?.id !== useInteraction.getState().active?.id) {
       useInteraction.getState().setActive(next);
@@ -161,6 +180,12 @@ export default function PlaceScene({ place, shadows, treeDensity, onReady }: Pla
       <Benches benches={manifest.benches} heightAt={heightAt} />
       <Lamps lamps={manifest.lamps} heightAt={heightAt} />
       <Props props={place.props} heightAt={heightAt} />
+      {place.npcs.map((spot) => {
+        const npc = getNpc(spot.npc);
+        return npc ? (
+          <Npc key={spot.npc} npc={npc} spot={spot} y={heightAt(spot.x, spot.z)} />
+        ) : null;
+      })}
 
       <RigidBody type="fixed" colliders={false}>
         {colliders.map((args, index) => (

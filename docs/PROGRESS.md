@@ -2,6 +2,19 @@
 
 Newest entry first.
 
+## M3: NPC role play (done)
+
+- NPC definitions in `content/npcs/*.json`, validated with Zod (persona, speech style with dialect 0 to 3, knowledge, goals, mood, boundaries, actions, look, greetings, mock script).
+- Three NPCs in Görlitzer Park: Jule (musician), Tarek (student having a picnic), Micha (dog owner, with dog Bolle).
+- `/api/npc/chat` streams newline-delimited JSON: reply text as it arrives, then the validated reply, then updated memory.
+- Qwen through the OpenAI-compatible API with streaming and JSON mode; default model `qwen-flash`. Without a key the same pipeline runs on a local mock.
+- Guardrails in the prompt and in code: player text is delimited and sanitized, likely injections add a warning to the prompt, output is checked for prompt leaks and blocked topics (also mid-stream) and replaced by an in-character deflection.
+- Replies are parsed tolerantly (code fences, truncated JSON, unknown emotions, actions the NPC lacks).
+- Rate limit: 30 messages per player per hour plus a global daily cap, in memory for now (Supabase in M5), with a friendly in-game notice.
+- Memory per player and NPC: last 12 messages plus a model-written summary every third turn; NPCs greet returning players by name.
+- Chat panel (right on desktop, bottom sheet on mobile), conversation starters, emotion and action bubbles above NPCs, actions unlock experiences and can seat the player.
+- 119 unit tests, 13 Playwright scenarios per viewport.
+
 ## M2: Görlitzer Park (done)
 
 - Asset pipeline in TypeScript, one command: `pnpm assets:build`.

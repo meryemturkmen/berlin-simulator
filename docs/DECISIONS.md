@@ -45,3 +45,19 @@ Colors are authored as a pastel palette. The renderer runs without tone mapping 
 ## D11: Quality levels pulled forward from M6
 
 Software renderers (CI, some VMs) and weak phones need a cheaper mode to stay responsive, so the low/medium/high levels with auto-detection were built in M2. A manual override is stored in settings; its UI follows in M6.
+
+## D12: Default model `qwen-flash`
+
+Model Studio lists `qwen-flash`, `qwen-turbo` and `qwen-plus` for the international region. `qwen-flash` is the fast, low-cost tier and is enough for one-to-four-sentence small talk, so it is the default. `QWEN_MODEL` overrides it. The official pricing page could not be opened from the development container (host not allowlisted), so prices were not verified first-hand; check them in the console before going public.
+
+## D13: Plain fetch instead of the OpenAI SDK
+
+The chat needs two calls (streamed completion, short non-streamed completion). A 90-line fetch client against the OpenAI-compatible endpoint covers that, keeps the server bundle small and is easy to fake in tests. Thinking is switched off and JSON mode switched on; if a model rejects those parameters the request is retried once without them.
+
+## D14: Chat transport and streaming of structured replies
+
+The model must answer with JSON, but players should see text appear as it is generated. The server extracts the `reply` string from the partial JSON while it streams and forwards only that text. The final event carries the validated reply and replaces whatever was streamed, so a guardrail hit can still swap the text.
+
+## D15: Where NPC memory lives
+
+Without Supabase the browser holds the memory (localStorage) and sends it with each turn; the server validates and bounds it. With Supabase (M5) the server loads and stores memory itself and ignores the client copy.

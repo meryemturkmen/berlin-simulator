@@ -49,6 +49,8 @@ export function Hud({ place }: { place: Place }) {
     const onKey = (event: KeyboardEvent) => {
       if (event.code !== "KeyE" || event.repeat || isTyping(event.target)) return;
       if (usePlayer.getState().frozen) return;
+      // Otherwise the letter lands in the chat input that opens on this key press.
+      event.preventDefault();
       if (usePlayer.getState().seat) usePlayer.getState().stand();
       else useInteraction.getState().active?.onInteract();
     };

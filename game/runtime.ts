@@ -18,6 +18,13 @@ export const runtime = {
   ready: false,
   /** Smoothed frames per second. */
   fps: 60,
+  /** Point the player and camera turn toward while a conversation is open. */
+  focus: null as { x: number; z: number } | null,
+  /**
+   * Shifts the rendered view while a panel covers part of the screen, as
+   * fractions of the viewport: +x moves the scene left, +y moves it up.
+   */
+  viewShift: { x: 0, y: 0 },
   /** One-shot request to move the player, consumed by the controller. */
   teleport: null as { x: number; z: number; heading: number } | null,
 };

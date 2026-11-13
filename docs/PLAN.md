@@ -37,17 +37,17 @@ Checked items are done and verified. See `docs/PROGRESS.md` for the log and `doc
 
 ## M3: NPC role play
 
-- [ ] NPC schema and three Görli NPCs in `content/npcs`
-- [ ] Prompt builder with guardrails and injection protection
-- [ ] Qwen client (OpenAI-compatible) with streaming
-- [ ] Reply schema, tolerant JSON parsing, fallback reply
-- [ ] Mock mode without `QWEN_API_KEY`
-- [ ] Rate limit (per user per hour, global per day) with in-memory store
-- [ ] `/api/npc/chat` route handler
-- [ ] Chat overlay with "Talk (E)" hint, streamed text, emotions
-- [ ] Actions trigger game events
-- [ ] Memory: last messages plus summary per player and NPC (localStorage for now)
-- [ ] Acceptance: unit tests for prompt, schema, rate limit; Playwright chats in mock mode; injection cases handled
+- [x] NPC schema and three Görli NPCs in `content/npcs`
+- [x] Prompt builder with guardrails and injection protection
+- [x] Qwen client (OpenAI-compatible) with streaming
+- [x] Reply schema, tolerant JSON parsing, fallback reply
+- [x] Mock mode without `QWEN_API_KEY`
+- [x] Rate limit (per user per hour, global per day) with in-memory store
+- [x] `/api/npc/chat` route handler
+- [x] Chat overlay with "Talk (E)" hint, streamed text, emotions
+- [x] Actions trigger game events
+- [x] Memory: last messages plus summary per player and NPC (localStorage for now)
+- [x] Acceptance: unit tests for prompt, schema, rate limit; Playwright chats in mock mode; injection cases handled
 
 ## M4: Map, teleport, Mitte and Ku'damm
 

@@ -13,7 +13,10 @@ interface PlayerState {
   seat: Seat | null;
   /** True while a modal overlay (chat, map) owns the input. */
   frozen: boolean;
+  /** Seat id an NPC invited the player to; the scene resolves it to a position. */
+  seatRequest: string | null;
   sit: (seat: Seat) => void;
+  requestSeat: (seatId: string | null) => void;
   stand: () => void;
   setFrozen: (frozen: boolean) => void;
 }
@@ -21,7 +24,9 @@ interface PlayerState {
 export const usePlayer = create<PlayerState>((set) => ({
   seat: null,
   frozen: false,
-  sit: (seat) => set({ seat }),
+  seatRequest: null,
+  sit: (seat) => set({ seat, seatRequest: null }),
+  requestSeat: (seatRequest) => set({ seatRequest }),
   stand: () => set({ seat: null }),
   setFrozen: (frozen) => set({ frozen }),
 }));

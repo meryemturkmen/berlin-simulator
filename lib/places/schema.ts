@@ -50,6 +50,7 @@ export const npcSpotSchema = z.object({
   ...point,
   heading: z.number(),
   pose: z.enum(["stand", "sit_ground", "sit_bench", "play_guitar"]).default("stand"),
+  companion: z.enum(["dog"]).optional(),
 });
 export type NpcSpot = z.infer<typeof npcSpotSchema>;
 

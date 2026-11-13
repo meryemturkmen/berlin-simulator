@@ -49,6 +49,8 @@ export default defineConfig({
       NEXT_PUBLIC_SUPABASE_URL: "",
       NEXT_PUBLIC_SUPABASE_ANON_KEY: "",
       SUPABASE_SERVICE_ROLE_KEY: "",
+      // High enough that the suite never trips the limiter by accident.
+      RATE_LIMIT_PER_HOUR: "500",
     },
   },
 });

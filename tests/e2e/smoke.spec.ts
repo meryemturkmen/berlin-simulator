@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { createAvatarAndPlay, snapshot, walkForward } from "./helpers";
+import { createAvatarAndPlay, walkForward } from "./helpers";
 
 test("title page loads", async ({ page }) => {
   await page.goto("/");
@@ -45,9 +45,5 @@ test("visiting /play without an avatar redirects to the editor", async ({ page }
 
 test("player can create an avatar and walk", async ({ page }) => {
   await createAvatarAndPlay(page);
-  const before = await snapshot(page);
-  await walkForward(page);
-  const after = await snapshot(page);
-  const distance = Math.hypot(after.player.x - before.player.x, after.player.z - before.player.z);
-  expect(distance).toBeGreaterThan(1.5);
+  expect(await walkForward(page, 1.5)).toBeGreaterThan(1.5);
 });

@@ -45,20 +45,32 @@ export function isMobile(page: Page): boolean {
   return (page.viewportSize()?.width ?? 1440) < 600;
 }
 
-/** Walks forward for a moment using the keyboard or the touch joystick. */
-export async function walkForward(page: Page, milliseconds = 1200) {
-  if (isMobile(page)) {
+/**
+ * Holds "forward" (keyboard or touch joystick) until the player has covered
+ * `meters`. Polls instead of sleeping so slow software-rendered CI runs pass.
+ */
+export async function walkForward(page: Page, meters = 1.5): Promise<number> {
+  const start = (await snapshot(page)).player;
+  const moved = async () => {
+    const now = (await snapshot(page)).player;
+    return Math.hypot(now.x - start.x, now.z - start.z);
+  };
+  const mobile = isMobile(page);
+  if (mobile) {
     const box = (await page.getByTestId("joystick").boundingBox())!;
     const cx = box.x + box.width / 2;
     const cy = box.y + box.height / 2;
     await page.mouse.move(cx, cy);
     await page.mouse.down();
     await page.mouse.move(cx, cy - 40, { steps: 4 });
-    await page.waitForTimeout(milliseconds);
-    await page.mouse.up();
   } else {
     await page.keyboard.down("KeyW");
-    await page.waitForTimeout(milliseconds);
-    await page.keyboard.up("KeyW");
   }
+  try {
+    await expect.poll(moved, { timeout: 30_000, intervals: [200] }).toBeGreaterThan(meters);
+  } finally {
+    if (mobile) await page.mouse.up();
+    else await page.keyboard.up("KeyW");
+  }
+  return moved();
 }

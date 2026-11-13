@@ -25,3 +25,23 @@ The UI ships in German and English with a toggle. The default follows the browse
 ## D6: LoD2 license
 
 The ATOM feed of the Berlin LoD2 dataset states "Datenlizenz Deutschland - Zero - Version 2.0" (dl-de/zero-2-0), not the attribution license the brief assumed. No attribution is legally required; we credit Geoportal Berlin anyway.
+
+## D7: OSM data source
+
+The fetch script tries Overpass (overpass-api.de, then a mirror) and falls back to the main OSM API's `/api/0.6/map` endpoint, which serves the same data for small bounding boxes. All three return OSM XML, so there is one parser. In the development container Overpass was unreachable and the fallback was used.
+
+## D8: Ground layers as flat decals
+
+Green areas, paths, roads and markings are separate meshes a few centimeters above the ground that do not write depth and are drawn in a fixed order. This avoids polygon boolean operations in the pipeline and z-fighting at runtime. Where a place has terrain, ground and layers are subdivided to 3 m only around the bumps.
+
+## D9: Procedural windows from a vertex attribute
+
+Buildings ship without textures or normals. The pipeline stores, per wall vertex, the distance along the wall, the height, the wall width and the wall top. The fragment shader derives evenly spaced windows, shop-height ground floors and randomly lit windows at night from that. One draw call for all buildings of a place.
+
+## D10: No tone mapping
+
+Colors are authored as a pastel palette. The renderer runs without tone mapping (`flat`) and light intensities are tuned so sunlit surfaces land near their palette color.
+
+## D11: Quality levels pulled forward from M6
+
+Software renderers (CI, some VMs) and weak phones need a cheaper mode to stay responsive, so the low/medium/high levels with auto-detection were built in M2. A manual override is stored in settings; its UI follows in M6.

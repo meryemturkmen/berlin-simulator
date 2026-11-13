@@ -1,59 +1,39 @@
 "use client";
 
-import { Sky } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { CuboidCollider, Physics, RigidBody } from "@react-three/rapier";
+import { Physics } from "@react-three/rapier";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import { Suspense, useEffect, useRef } from "react";
-import { Joystick } from "@/components/hud/Joystick";
-import { useIsTouch } from "@/lib/useIsTouch";
-import { useT } from "@/lib/i18n/useT";
+import { Suspense, useCallback, useEffect, useMemo, useRef } from "react";
+import * as THREE from "three";
+import { Hud } from "@/components/hud/Hud";
+import { LoadingScreen } from "@/components/hud/LoadingScreen";
+import { getPlace, PLACES } from "@/content/places";
+import { terrainHeight } from "@/lib/places/terrain";
 import { useKeyboardInput } from "./input";
 import { Player } from "./player/Player";
-import { installDebugProbe } from "./runtime";
+import { installDebugProbe, setDebugPlace, setDebugQuality } from "./runtime";
+import { DayNight } from "./sky/DayNight";
 import { useProfile } from "./store/profile";
+import { useWorld } from "./store/world";
 import { useLookControls } from "./useLookControls";
+import { useQuality } from "./useQuality";
 
-const SPAWN = { position: [0, 0.1, 0] as [number, number, number], heading: 0 };
-
-function TestGround() {
-  return (
-    <>
-      <RigidBody type="fixed" colliders={false}>
-        <CuboidCollider args={[100, 0.5, 100]} position={[0, -0.5, 0]} />
-        <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-          <planeGeometry args={[200, 200]} />
-          <meshStandardMaterial color="#8fb873" />
-        </mesh>
-      </RigidBody>
-      {[
-        [4, 0.75, -6, "#e4604a"],
-        [-5, 0.75, -3, "#f3b95f"],
-        [2, 0.75, 7, "#3f6fb0"],
-      ].map(([x, y, z, color]) => (
-        <RigidBody
-          key={`${x}-${z}`}
-          type="fixed"
-          position={[x as number, y as number, z as number]}
-        >
-          <mesh castShadow receiveShadow>
-            <boxGeometry args={[1.5, 1.5, 1.5]} />
-            <meshStandardMaterial color={color as string} />
-          </mesh>
-        </RigidBody>
-      ))}
-    </>
-  );
-}
+// The scene code is its own chunk; each place's GLB and manifest load on demand.
+const PlaceScene = dynamic(() => import("./place/PlaceScene"), { ssr: false });
 
 export default function Game() {
-  const t = useT();
   const router = useRouter();
   const root = useRef<HTMLDivElement>(null);
-  const isTouch = useIsTouch();
+  const quality = useQuality();
   const status = useProfile((state) => state.status);
   const avatar = useProfile((state) => state.avatar);
   const hydrate = useProfile((state) => state.hydrate);
+  const placeId = useWorld((state) => state.placeId);
+  const phase = useWorld((state) => state.phase);
+  const factIndex = useWorld((state) => state.factIndex);
+  const markReady = useWorld((state) => state.markReady);
+  const place = getPlace(placeId) ?? PLACES[0];
 
   useKeyboardInput();
   useLookControls(root);
@@ -63,40 +43,74 @@ export default function Game() {
     void hydrate();
   }, [hydrate]);
 
+  useEffect(() => setDebugQuality(quality.level), [quality.level]);
+
   // No avatar yet: send the player to the editor first.
   useEffect(() => {
     if (status === "ready" && !avatar) router.replace("/avatar");
   }, [status, avatar, router]);
 
+  const heightAt = useCallback(
+    (x: number, z: number) => terrainHeight(place.terrain, x, z),
+    [place.terrain],
+  );
+  const spawn = useMemo(
+    () => ({
+      position: [
+        place.spawn.x,
+        terrainHeight(place.terrain, place.spawn.x, place.spawn.z) + 0.3,
+        place.spawn.z,
+      ] as [number, number, number],
+      heading: place.spawn.heading,
+    }),
+    [place],
+  );
+
+  // `?hour=20.2` pins the starting time of day (screenshots and tests).
+  const startHour = useMemo(() => {
+    const value = Number.parseFloat(new URLSearchParams(window.location.search).get("hour") ?? "");
+    return Number.isFinite(value) ? THREE.MathUtils.clamp(value, 0, 24) : null;
+  }, []);
+
+  const onReady = useCallback(() => {
+    setDebugPlace(place.id);
+    markReady();
+  }, [place.id, markReady]);
+
   return (
-    <div ref={root} className="game-root bg-sky" data-testid="game-root">
+    <div ref={root} className="game-root bg-dusk" data-testid="game-root">
       {avatar && (
-        <Canvas shadows camera={{ position: [0, 3, 8], fov: 55, near: 0.1, far: 600 }} dpr={[1, 2]}>
-          <Sky sunPosition={[40, 30, 20]} turbidity={6} rayleigh={1.2} />
-          <hemisphereLight args={["#dfeeff", "#6f8a5a", 0.9]} />
-          <directionalLight
-            position={[40, 30, 20]}
-            intensity={2.2}
-            castShadow
-            shadow-mapSize={[2048, 2048]}
-            shadow-camera-left={-30}
-            shadow-camera-right={30}
-            shadow-camera-top={30}
-            shadow-camera-bottom={-30}
+        // Remount on a quality change: shadow support is fixed when the renderer starts.
+        <Canvas
+          key={quality.level}
+          shadows={quality.shadowMapSize > 0}
+          flat
+          camera={{ position: [0, 3, 8], fov: 55, near: 0.3, far: 700 }}
+          dpr={[1, quality.maxPixelRatio]}
+        >
+          <DayNight
+            key={place.id}
+            startHour={startHour ?? place.startHour}
+            shadowMapSize={quality.shadowMapSize}
+            clouds={quality.clouds}
+            fogFar={place.halfSize + place.backdrop + 160}
           />
           <Suspense fallback={null}>
-            <Physics timeStep="vary">
-              <TestGround />
-              <Player look={avatar} spawn={SPAWN} />
+            <Physics timeStep="vary" key={place.id}>
+              <PlaceScene
+                place={place}
+                shadows={quality.shadowMapSize > 0}
+                treeDensity={quality.treeDensity}
+                onReady={onReady}
+              />
+              <Player look={avatar} spawn={spawn} heightAt={heightAt} />
             </Physics>
           </Suspense>
         </Canvas>
       )}
 
-      <p className="bg-ink/55 pointer-events-none absolute top-3 left-1/2 w-max max-w-[92vw] -translate-x-1/2 rounded-full px-4 py-2 text-center text-sm text-white backdrop-blur">
-        {t(isTouch ? "hud.controlsMobile" : "hud.controlsDesktop")}
-      </p>
-      {isTouch && <Joystick />}
+      {phase === "playing" && <Hud place={place} />}
+      <LoadingScreen place={place} factIndex={factIndex} visible={phase === "loading"} />
     </div>
   );
 }

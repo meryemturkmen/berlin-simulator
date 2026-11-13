@@ -24,16 +24,16 @@ Checked items are done and verified. See `docs/PROGRESS.md` for the log and `doc
 
 ## M2: First real place (Görlitzer Park)
 
-- [ ] `scripts/fetch_lod2`: resolve and download LoD2 tiles from Geoportal Berlin
-- [ ] `scripts/fetch_osm`: Overpass query for paths, green, water, trees, benches
-- [ ] `scripts/build_buildings`: CityGML → clipped, triangulated, centered GLB
-- [ ] `scripts/build_place`: environment geometry, colliders, manifest
-- [ ] Compression with gltf-transform; `pnpm assets:build` runs everything
-- [ ] Place scene: stylized materials, procedural windows, instanced trees and benches
-- [ ] Collision and invisible play-area bounds
-- [ ] Day-night cycle with sky, soft light, shadows
-- [ ] Sit down on benches and picnic blankets
-- [ ] Acceptance: pipeline runs clean, GLB under target size, scene loads < 5 s locally, screenshots look right
+- [x] `scripts/fetch_lod2`: resolve and download LoD2 tiles from Geoportal Berlin
+- [x] `scripts/fetch_osm`: Overpass query for paths, green, water, trees, benches
+- [x] `scripts/build_buildings`: CityGML → clipped, triangulated, centered GLB
+- [x] `scripts/build_place`: environment geometry, colliders, manifest
+- [x] Compression with gltf-transform; `pnpm assets:build` runs everything
+- [x] Place scene: stylized materials, procedural windows, instanced trees and benches
+- [x] Collision and invisible play-area bounds
+- [x] Day-night cycle with sky, soft light, shadows
+- [x] Sit down on benches and picnic blankets
+- [x] Acceptance: pipeline runs clean, GLB under target size, scene loads < 5 s locally, screenshots look right
 
 ## M3: NPC role play
 

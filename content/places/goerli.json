@@ -1,0 +1,166 @@
+{
+  "id": "goerli",
+  "name": {
+    "de": "Görlitzer Park",
+    "en": "Görlitzer Park"
+  },
+  "district": {
+    "de": "Kreuzberg",
+    "en": "Kreuzberg"
+  },
+  "tagline": {
+    "de": "Wiese, Musik und ein langer Sonnenuntergang",
+    "en": "Lawns, music and a long sunset"
+  },
+  "center": {
+    "lat": 52.4966,
+    "lon": 13.4371
+  },
+  "halfSize": 150,
+  "backdrop": 70,
+  "palette": {
+    "ground": "#ddd0b4",
+    "grass": ["#8fbf6a", "#9cc873", "#84b562"],
+    "path": "#e6d3a8",
+    "plaza": "#e2d2ad",
+    "road": "#8d8b93",
+    "curb": "#c9c2b6",
+    "water": "#6fb7d6",
+    "walls": ["#f2c9a5", "#f6dfb4", "#e9b8a0", "#d7e0c0", "#f3e6cf", "#e3c7d6", "#c9dbe6"],
+    "roofs": ["#b5634a", "#9c5a4b", "#7d6b70", "#8a8f99"],
+    "foliage": ["#5f9a4e", "#74ad55", "#4f8a4a", "#88b85c"],
+    "trunk": "#7a5a43"
+  },
+  "terrain": [
+    {
+      "x": 40,
+      "z": 5,
+      "radius": 72,
+      "height": -5
+    },
+    {
+      "x": -72,
+      "z": 58,
+      "radius": 34,
+      "height": 2.6
+    }
+  ],
+  "scatterTrees": 140,
+  "spawn": {
+    "x": -14,
+    "z": -2,
+    "heading": 1.2
+  },
+  "facts": [
+    {
+      "de": "Der Görlitzer Park liegt auf dem Gelände des alten Görlitzer Bahnhofs. Von hier fuhren einst die Züge Richtung Cottbus und Görlitz.",
+      "en": "Görlitzer Park sits on the grounds of the old Görlitzer Bahnhof. Trains once left from here for Cottbus and Görlitz."
+    },
+    {
+      "de": "Die große Mulde in der Parkmitte ist der Rest eines Fußgängertunnels, der früher unter den Gleisen hindurchführte.",
+      "en": "The big hollow in the middle of the park is what remains of a pedestrian tunnel that once ran under the tracks."
+    },
+    {
+      "de": "Im Park gibt es einen Kinderbauernhof mit Ziegen, Schafen und Eseln, mitten in Kreuzberg.",
+      "en": "The park has a children's farm with goats, sheep and donkeys, right in the middle of Kreuzberg."
+    }
+  ],
+  "experiences": [
+    {
+      "id": "goerli_sunset",
+      "icon": "🌇",
+      "title": {
+        "de": "Sonnenuntergang im Görli",
+        "en": "Sunset in Görli"
+      },
+      "description": {
+        "de": "Im Sitzen zugeschaut, wie die Sonne hinter den Dächern verschwindet.",
+        "en": "Sat down and watched the sun slip behind the rooftops."
+      }
+    },
+    {
+      "id": "goerli_song",
+      "icon": "🎸",
+      "title": {
+        "de": "Ein Lied nur für dich",
+        "en": "A song just for you"
+      },
+      "description": {
+        "de": "Die Musikerin hat dir etwas vorgespielt.",
+        "en": "The musician played something for you."
+      }
+    },
+    {
+      "id": "goerli_picnic",
+      "icon": "🧺",
+      "title": {
+        "de": "Zum Picknick eingeladen",
+        "en": "Invited to a picnic"
+      },
+      "description": {
+        "de": "Auf einer fremden Decke Platz genommen und geteilt, was da war.",
+        "en": "Took a seat on a stranger's blanket and shared what was there."
+      }
+    },
+    {
+      "id": "goerli_dog",
+      "icon": "🐕",
+      "title": {
+        "de": "Hundefreundschaft",
+        "en": "A new dog friend"
+      },
+      "description": {
+        "de": "Den freundlichsten Hund im Park kennengelernt.",
+        "en": "Met the friendliest dog in the park."
+      }
+    }
+  ],
+  "ambient": "park",
+  "startHour": 16.5,
+  "props": [
+    {
+      "type": "blanket",
+      "x": 22,
+      "z": -22,
+      "rotation": 0.4,
+      "color": "#e4604a"
+    },
+    {
+      "type": "blanket",
+      "x": 58,
+      "z": 28,
+      "rotation": -0.3,
+      "color": "#3f6fb0"
+    },
+    {
+      "type": "blanket",
+      "x": 72,
+      "z": -20,
+      "rotation": 1.1,
+      "color": "#f3b95f"
+    }
+  ],
+  "seats": [
+    {
+      "id": "blanket-1",
+      "x": 21.49,
+      "z": -21.79,
+      "heading": -1.45,
+      "mode": "ground"
+    },
+    {
+      "id": "blanket-2",
+      "x": 57.47,
+      "z": 27.84,
+      "heading": -1.45,
+      "mode": "ground"
+    },
+    {
+      "id": "blanket-3",
+      "x": 71.75,
+      "z": -19.51,
+      "heading": -1.45,
+      "mode": "ground"
+    }
+  ]
+}

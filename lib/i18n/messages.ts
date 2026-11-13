@@ -53,6 +53,11 @@ const de = {
   "hud.controlsDesktop": "WASD oder Pfeiltasten: laufen · Shift: rennen · Maus ziehen: umsehen",
   "hud.controlsMobile": "Links: laufen · Rechts ziehen: umsehen",
   "hud.loading": "Lädt",
+  "hud.arriving": "Unterwegs nach",
+  "hud.didYouKnow": "Schon gewusst?",
+  "interact.sit": "Hinsetzen",
+  "interact.stand": "Aufstehen",
+  "interact.talk": "Sprechen",
 } as const;
 
 export type MessageKey = keyof typeof de;
@@ -109,6 +114,11 @@ const en: Record<MessageKey, string> = {
   "hud.controlsDesktop": "WASD or arrow keys: walk · Shift: run · Drag mouse: look around",
   "hud.controlsMobile": "Left: walk · Drag right: look around",
   "hud.loading": "Loading",
+  "hud.arriving": "On the way to",
+  "hud.didYouKnow": "Did you know?",
+  "interact.sit": "Sit down",
+  "interact.stand": "Stand up",
+  "interact.talk": "Talk",
 };
 
 export const messages: Record<Language, Record<MessageKey, string>> = { de, en };

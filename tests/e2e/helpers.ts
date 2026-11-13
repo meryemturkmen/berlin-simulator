@@ -5,6 +5,27 @@ export function snapshot(page: Page): Promise<DebugSnapshot> {
   return page.evaluate(() => window.__berlin!());
 }
 
+const TEST_AVATAR = {
+  name: "Mer",
+  build: "medium",
+  skin: "#d9a37c",
+  hairStyle: "bob",
+  hairColor: "#4a3024",
+  top: "hoodie",
+  topColor: "#e4604a",
+  bottom: "jeans",
+  bottomColor: "#3f6fb0",
+  shoes: "sneakers",
+  shoeColor: "#f4efe6",
+};
+
+/** Stores an avatar before the app starts, so tests can open /play directly. */
+export async function seedAvatar(page: Page) {
+  await page.addInitScript((avatar) => {
+    window.localStorage.setItem("berlin-sim:v1:avatar", avatar);
+  }, JSON.stringify(TEST_AVATAR));
+}
+
 /** Goes through the title screen and avatar editor and waits for the game to run. */
 export async function createAvatarAndPlay(page: Page, name = "Mer") {
   await page.goto("/");

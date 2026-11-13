@@ -9,7 +9,7 @@ import { AvatarModel, createPose } from "@/game/avatar/AvatarModel";
 import type { AvatarLook } from "@/game/avatar/schema";
 import { input, readMove, type MoveIntent } from "@/game/input";
 import { runtime } from "@/game/runtime";
-import { usePlayer } from "@/game/store/player";
+import { usePlayer, type Seat } from "@/game/store/player";
 
 const WALK_SPEED = 3.4;
 const RUN_SPEED = 6.4;
@@ -19,10 +19,13 @@ const CAPSULE_RADIUS = 0.3;
 const CAMERA_MIN_DISTANCE = 2.6;
 const CAMERA_MAX_DISTANCE = 9;
 const CAMERA_HEAD_HEIGHT = 1.45;
+const DOWN = { x: 0, y: -1, z: 0 };
 
 interface PlayerProps {
   look: AvatarLook;
   spawn: { position: [number, number, number]; heading: number };
+  /** Terrain height lookup, used when the player is placed somewhere directly. */
+  heightAt: (x: number, z: number) => number;
 }
 
 /**
@@ -30,13 +33,15 @@ interface PlayerProps {
  * controller, with a follow camera that orbits on mouse or touch drag and
  * pulls in when geometry gets between it and the player.
  */
-export function Player({ look, spawn }: PlayerProps) {
+export function Player({ look, spawn, heightAt }: PlayerProps) {
   const { world, rapier } = useRapier();
   const camera = useThree((state) => state.camera);
   const body = useRef<RapierRigidBody>(null);
   const visual = useRef<THREE.Group>(null);
   const poseRef = useRef(createPose());
   const verticalVelocity = useRef(0);
+  const hasGround = useRef(false);
+  const lastSeat = useRef<Seat | null>(null);
   const smoothedTarget = useRef(new THREE.Vector3());
   const cameraDistance = useRef(runtime.camera.distance);
   const scratch = useMemo(
@@ -45,6 +50,7 @@ export function Player({ look, spawn }: PlayerProps) {
       desired: new THREE.Vector3(),
       target: new THREE.Vector3(),
       offset: new THREE.Vector3(),
+      probe: new THREE.Vector3(),
     }),
     [],
   );
@@ -77,6 +83,7 @@ export function Player({ look, spawn }: PlayerProps) {
       spawn.position[2],
     );
     verticalVelocity.current = 0;
+    hasGround.current = false;
     return () => {
       runtime.ready = false;
     };
@@ -86,7 +93,23 @@ export function Player({ look, spawn }: PlayerProps) {
     const rigidBody = body.current;
     const controller = controllerRef.current;
     if (!rigidBody || !controller || rigidBody.numColliders() === 0) return;
-    const delta = Math.min(rawDelta, 1 / 20);
+    if (rawDelta > 0) runtime.fps += (1 / rawDelta - runtime.fps) * 0.1;
+    // Clamp long hitches (tab switches) but still track slow frames faithfully.
+    const delta = Math.min(rawDelta, 0.2);
+    const teleport = runtime.teleport;
+    if (teleport) {
+      runtime.teleport = null;
+      usePlayer.getState().stand();
+      lastSeat.current = null;
+      rigidBody.setTranslation(
+        { x: teleport.x, y: heightAt(teleport.x, teleport.z) + 0.2, z: teleport.z },
+        true,
+      );
+      runtime.player.heading = teleport.heading;
+      runtime.camera.yaw = teleport.heading + Math.PI;
+      verticalVelocity.current = 0;
+      runtime.ready = false; // snap the camera instead of gliding there
+    }
     const { seat, frozen } = usePlayer.getState();
     const pose = poseRef.current;
     const cam = runtime.camera;
@@ -115,6 +138,29 @@ export function Player({ look, spawn }: PlayerProps) {
     let nextY = position.y;
     let nextZ = position.z;
 
+    // Standing up: step clear of the seat so the capsule is not left inside it.
+    if (!seat && lastSeat.current) {
+      nextX += Math.sin(lastSeat.current.heading) * 0.75;
+      nextZ += Math.cos(lastSeat.current.heading) * 0.75;
+    }
+    lastSeat.current = seat;
+
+    // Probe the ground below. Until the scene's colliders exist there is
+    // nothing to stand on, so gravity waits; afterwards the probe also lifts
+    // the player back up should they ever end up below the surface.
+    scratch.probe.set(nextX, nextY + 1, nextZ);
+    const below = world.castRay(
+      new rapier.Ray(scratch.probe, DOWN),
+      6,
+      true,
+      rapier.QueryFilterFlags.EXCLUDE_SENSORS,
+      undefined,
+      undefined,
+      rigidBody,
+    );
+    const groundY = below ? nextY + 1 - below.timeOfImpact : null;
+    if (groundY !== null) hasGround.current = true;
+
     if (seat) {
       // Any movement input gets the player back up.
       if (Math.hypot(move.x, move.y) > 0.3 && !frozen) {
@@ -136,7 +182,11 @@ export function Player({ look, spawn }: PlayerProps) {
       const dirX = strength > 0 ? (move.x * cos - move.y * sin) / strength : 0;
       const dirZ = strength > 0 ? (-move.x * sin - move.y * cos) / strength : 0;
 
-      verticalVelocity.current = Math.max(verticalVelocity.current - GRAVITY * delta, -30);
+      // One swept move per frame: the controller shape-casts the whole
+      // displacement, so slow frames cover the right distance without tunneling.
+      verticalVelocity.current = hasGround.current
+        ? Math.max(verticalVelocity.current - GRAVITY * delta, -30)
+        : 0;
       scratch.desired.set(
         dirX * speed * delta,
         verticalVelocity.current * delta,
@@ -155,6 +205,10 @@ export function Player({ look, spawn }: PlayerProps) {
       nextY += moved.y;
       nextZ += moved.z;
 
+      if (groundY !== null && nextY < groundY - 0.05) {
+        nextY = groundY;
+        verticalVelocity.current = 0;
+      }
       // Safety net: never leave the player falling forever.
       if (nextY < -30) {
         [nextX, nextY, nextZ] = spawn.position;

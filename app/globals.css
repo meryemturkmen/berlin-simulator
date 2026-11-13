@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display), ui-serif, Georgia, serif;
+
+  /* Warm paper and ink, with a coral accent borrowed from Berlin evening light. */
+  --color-paper: #f7f0e3;
+  --color-paper-dim: #ebe1cf;
+  --color-ink: #211c2e;
+  --color-ink-soft: #4a4458;
+  --color-coral: #e4604a;
+  --color-coral-deep: #c44a36;
+  --color-moss: #5d8a5a;
+  --color-sky: #8fc4dc;
+  --color-dusk: #2b2a4c;
+  --color-sun: #f3b95f;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+/* The game canvas owns touch gestures; stop the page from scrolling or zooming under it. */
+.game-root {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.game-root input,
+.game-root textarea {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-coral);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

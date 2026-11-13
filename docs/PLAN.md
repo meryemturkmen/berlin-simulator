@@ -1,0 +1,85 @@
+# Implementation plan
+
+Checked items are done and verified. See `docs/PROGRESS.md` for the log and `docs/DECISIONS.md` for the reasoning.
+
+## M0: Foundation
+
+- [x] Next.js (App Router), TypeScript strict, Tailwind, pnpm
+- [x] ESLint, Prettier
+- [x] Vitest and Playwright set up with one test each
+- [x] GitHub Actions: lint, typecheck, unit tests, build, e2e
+- [x] `.env.example`, `CLAUDE.md`, docs files
+- [x] `/play`: empty 3D scene with ground, light, sky
+- [x] Acceptance: `pnpm build` and all checks green, CI running
+
+## M1: Avatar and movement
+
+- [ ] Avatar schema (Zod) and store with localStorage persistence
+- [ ] Avatar model (CC0 rigged pack by script, else procedural low-poly fallback)
+- [ ] Title screen and avatar editor with rotatable live preview
+- [ ] Third-person controller on Rapier: WASD/arrows, run, camera orbit
+- [ ] Mobile: virtual joystick and touch camera
+- [ ] Idle and walk animation
+- [ ] Acceptance: Playwright creates an avatar and moves it; screenshots desktop and mobile reviewed
+
+## M2: First real place (Görlitzer Park)
+
+- [ ] `scripts/fetch_lod2`: resolve and download LoD2 tiles from Geoportal Berlin
+- [ ] `scripts/fetch_osm`: Overpass query for paths, green, water, trees, benches
+- [ ] `scripts/build_buildings`: CityGML → clipped, triangulated, centered GLB
+- [ ] `scripts/build_place`: environment geometry, colliders, manifest
+- [ ] Compression with gltf-transform; `pnpm assets:build` runs everything
+- [ ] Place scene: stylized materials, procedural windows, instanced trees and benches
+- [ ] Collision and invisible play-area bounds
+- [ ] Day-night cycle with sky, soft light, shadows
+- [ ] Sit down on benches and picnic blankets
+- [ ] Acceptance: pipeline runs clean, GLB under target size, scene loads < 5 s locally, screenshots look right
+
+## M3: NPC role play
+
+- [ ] NPC schema and three Görli NPCs in `content/npcs`
+- [ ] Prompt builder with guardrails and injection protection
+- [ ] Qwen client (OpenAI-compatible) with streaming
+- [ ] Reply schema, tolerant JSON parsing, fallback reply
+- [ ] Mock mode without `QWEN_API_KEY`
+- [ ] Rate limit (per user per hour, global per day) with in-memory store
+- [ ] `/api/npc/chat` route handler
+- [ ] Chat overlay with "Talk (E)" hint, streamed text, emotions
+- [ ] Actions trigger game events
+- [ ] Memory: last messages plus summary per player and NPC (localStorage for now)
+- [ ] Acceptance: unit tests for prompt, schema, rate limit; Playwright chats in mock mode; injection cases handled
+
+## M4: Map, teleport, Mitte and Ku'damm
+
+- [ ] District boundaries by script → simplified map data
+- [ ] Map overlay (key `M` and button) with place markers
+- [ ] Teleport with transition and loading screen with a Berlin fact
+- [ ] Lazy-loaded scene per place
+- [ ] Mitte: café corner, outdoor seating, barista, drink order → inventory and experience
+- [ ] Ku'damm: boulevard, shop fronts with invented names, benches, three NPCs
+- [ ] Acceptance: Playwright teleports to all three places; screenshots of all places reviewed
+
+## M5: Supabase
+
+- [ ] Migrations: `profiles`, `npc_memories`, `experiences`, `rate_limits`, RLS, rate-limit function
+- [ ] Anonymous sign-in on the client
+- [ ] Storage layer: Supabase when configured, else localStorage
+- [ ] Server: verify user token, service role only in route handlers
+- [ ] Rate limit and memory backed by Supabase
+- [ ] Acceptance: data-access tests; `docs/SETUP.md` has exact steps
+
+## M6: Atmosphere and experiences
+
+- [ ] Procedural ambient sound per place, quiet by default, mute button
+- [ ] Instanced background pedestrians on simple paths
+- [ ] Berlin album UI with 3 to 5 experiences per place
+- [ ] Emotion emoji above NPCs
+- [ ] Quality levels: auto-detect plus manual setting
+
+## M7: Portfolio polish
+
+- [ ] README with hero screenshot, features, architecture diagram, stack, local start, licenses
+- [ ] `/about` page with Mermaid diagram and data sources
+- [ ] `public/assets/LICENSES.md`
+- [ ] Lighthouse check of the start page
+- [ ] Final run of all tests

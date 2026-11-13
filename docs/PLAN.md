@@ -14,13 +14,13 @@ Checked items are done and verified. See `docs/PROGRESS.md` for the log and `doc
 
 ## M1: Avatar and movement
 
-- [ ] Avatar schema (Zod) and store with localStorage persistence
-- [ ] Avatar model (CC0 rigged pack by script, else procedural low-poly fallback)
-- [ ] Title screen and avatar editor with rotatable live preview
-- [ ] Third-person controller on Rapier: WASD/arrows, run, camera orbit
-- [ ] Mobile: virtual joystick and touch camera
-- [ ] Idle and walk animation
-- [ ] Acceptance: Playwright creates an avatar and moves it; screenshots desktop and mobile reviewed
+- [x] Avatar schema (Zod) and store with localStorage persistence
+- [x] Avatar model: procedural low-poly fallback (see DECISIONS D4)
+- [x] Title screen and avatar editor with rotatable live preview
+- [x] Third-person controller on Rapier: WASD/arrows, run, camera orbit
+- [x] Mobile: virtual joystick and touch camera
+- [x] Idle and walk animation
+- [x] Acceptance: Playwright creates an avatar and moves it; screenshots desktop and mobile reviewed
 
 ## M2: First real place (Görlitzer Park)
 

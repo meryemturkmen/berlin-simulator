@@ -18,6 +18,8 @@ export default defineConfig({
   use: {
     baseURL: `http://localhost:${PORT}`,
     trace: "off",
+    // The UI follows the browser language; tests assert on the German strings.
+    locale: "de-DE",
     launchOptions,
   },
   projects: [

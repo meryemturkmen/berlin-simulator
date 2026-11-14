@@ -1,0 +1,190 @@
+{
+  "id": "kudamm",
+  "name": {
+    "de": "Kurfürstendamm",
+    "en": "Kurfürstendamm"
+  },
+  "district": {
+    "de": "Charlottenburg",
+    "en": "Charlottenburg"
+  },
+  "tagline": {
+    "de": "Boulevard, Schaufenster und die Gedächtniskirche",
+    "en": "Boulevard, shop windows and the Memorial Church"
+  },
+  "center": {
+    "lat": 52.5048,
+    "lon": 13.335
+  },
+  "halfSize": 130,
+  "backdrop": 70,
+  "palette": {
+    "ground": "#e0dbd2",
+    "grass": ["#8fbd72", "#9bc67b", "#84b367"],
+    "path": "#e6dcc8",
+    "plaza": "#e9e3d6",
+    "road": "#85848d",
+    "curb": "#cbc6bd",
+    "water": "#6fb2d2",
+    "walls": ["#f3ead9", "#e8dccb", "#f0d9cf", "#d9dde3", "#f5e3c4", "#e3d3da", "#d6e0d4"],
+    "roofs": ["#6f7480", "#8a8f99", "#7b6f73", "#9a6a58"],
+    "foliage": ["#63a053", "#77ae5a", "#55904d"],
+    "trunk": "#75573f"
+  },
+  "terrain": [],
+  "scatterTrees": 0,
+  "spawn": {
+    "x": -6,
+    "z": 27,
+    "heading": 2.9
+  },
+  "facts": [
+    {
+      "de": "Der Kurfürstendamm begann als Reitweg der Kurfürsten zum Jagdschloss Grunewald. Zum Boulevard wurde er erst ab den 1880er-Jahren.",
+      "en": "Kurfürstendamm began as a bridle path for the electors to their hunting lodge in Grunewald. It only became a boulevard from the 1880s on."
+    },
+    {
+      "de": "Die Ruine der Kaiser-Wilhelm-Gedächtniskirche blieb nach dem Krieg bewusst als Mahnmal stehen. Die Berliner nennen sie den hohlen Zahn.",
+      "en": "The ruin of the Kaiser Wilhelm Memorial Church was deliberately kept as a memorial after the war. Berliners call it the hollow tooth."
+    },
+    {
+      "de": "Der Ku'damm ist rund 3,5 Kilometer lang. Die Hausnummern beginnen erst bei 11.",
+      "en": "Ku'damm is about 3.5 kilometers long. Its house numbers only start at 11."
+    }
+  ],
+  "experiences": [
+    {
+      "id": "kudamm_story",
+      "icon": "📻",
+      "title": {
+        "de": "Geschichten vom alten Westen",
+        "en": "Stories of the old West"
+      },
+      "description": {
+        "de": "Einem Ur-Charlottenburger zugehört, wie es früher am Ku'damm war.",
+        "en": "Listened to a lifelong local tell how Ku'damm used to be."
+      }
+    },
+    {
+      "id": "kudamm_photo",
+      "icon": "📸",
+      "title": {
+        "de": "Bitte lächeln",
+        "en": "Say cheese"
+      },
+      "description": {
+        "de": "Ein Foto für einen Touristen vor der Gedächtniskirche gemacht.",
+        "en": "Took a photo for a tourist in front of the Memorial Church."
+      }
+    },
+    {
+      "id": "kudamm_window",
+      "icon": "🛍️",
+      "title": {
+        "de": "Schaufensterbummel",
+        "en": "Window shopping"
+      },
+      "description": {
+        "de": "Die neue Auslage gezeigt bekommen.",
+        "en": "Got shown the new window display."
+      }
+    },
+    {
+      "id": "kudamm_bench",
+      "icon": "🌳",
+      "title": {
+        "de": "Pause auf dem Boulevard",
+        "en": "A break on the boulevard"
+      },
+      "description": {
+        "de": "Auf einer Bank gesessen und den Leuten zugeschaut.",
+        "en": "Sat on a bench and watched the world go by."
+      }
+    }
+  ],
+  "ambient": "boulevard",
+  "startHour": 14,
+  "props": [
+    {
+      "type": "bench",
+      "x": -31,
+      "z": 20.5,
+      "rotation": 0
+    },
+    {
+      "type": "bench",
+      "x": 22,
+      "z": 28,
+      "rotation": 0
+    },
+    {
+      "type": "bench",
+      "x": 44,
+      "z": 25,
+      "rotation": 0.2
+    },
+    {
+      "type": "planter",
+      "x": -43,
+      "z": 63.14,
+      "rotation": -0.3
+    },
+    {
+      "type": "planter",
+      "x": -29.5,
+      "z": 58.98,
+      "rotation": -0.3
+    }
+  ],
+  "seats": [],
+  "npcs": [
+    {
+      "npc": "carla",
+      "x": -50.45,
+      "z": 64.48,
+      "heading": -2.84,
+      "pose": "stand"
+    },
+    {
+      "npc": "diego",
+      "x": 9,
+      "z": 29,
+      "heading": 2.4,
+      "pose": "stand"
+    },
+    {
+      "npc": "lehmann",
+      "x": -31.45,
+      "z": 20.5,
+      "heading": 0,
+      "pose": "sit_bench"
+    }
+  ],
+  "shops": [
+    {
+      "name": "Hutsalon Wolke",
+      "x": -72.15,
+      "z": 73.98,
+      "heading": -2.84,
+      "color": "#8a6fc4",
+      "awning": true
+    },
+    {
+      "name": "Papeterie Lindgrün",
+      "x": -49.65,
+      "z": 67.06,
+      "heading": -2.84,
+      "color": "#5d8a5a",
+      "awning": true
+    },
+    {
+      "name": "Buchhandlung Seitenwind",
+      "x": -36.65,
+      "z": 63.06,
+      "heading": -2.84,
+      "color": "#b5412f",
+      "awning": true
+    }
+  ],
+  "benchExperience": "kudamm_bench"
+}

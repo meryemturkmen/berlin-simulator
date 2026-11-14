@@ -9,7 +9,9 @@ import { AvatarModel, createPose } from "@/game/avatar/AvatarModel";
 import type { AvatarLook } from "@/game/avatar/schema";
 import { input, readMove, type MoveIntent } from "@/game/input";
 import { runtime } from "@/game/runtime";
+import { useAlbum } from "@/game/store/album";
 import { usePlayer, type Seat } from "@/game/store/player";
+import type { ItemId } from "@/lib/npc/schema";
 
 const WALK_SPEED = 3.4;
 const RUN_SPEED = 6.4;
@@ -40,7 +42,24 @@ interface PlayerProps {
  * controller, with a follow camera that orbits on mouse or touch drag and
  * pulls in when geometry gets between it and the player.
  */
+/** The drink the player was last served, carried in the right hand. */
+function Cup({ drink }: { drink: ItemId }) {
+  return (
+    <group position={[0, -0.06, 0.07]}>
+      <mesh castShadow>
+        <cylinderGeometry args={[0.05, 0.04, 0.13, 10]} />
+        <meshStandardMaterial color="#f7f3ea" roughness={0.6} />
+      </mesh>
+      <mesh position={[0, 0.062, 0]}>
+        <cylinderGeometry args={[0.044, 0.044, 0.01, 10]} />
+        <meshStandardMaterial color={drink === "matcha" ? "#8fbf5a" : "#5a3a26"} />
+      </mesh>
+    </group>
+  );
+}
+
 export function Player({ look, spawn, heightAt }: PlayerProps) {
+  const drink = useAlbum((state) => state.inventory.at(-1));
   const { world, rapier } = useRapier();
   const camera = useThree((state) => state.camera);
   const size = useThree((state) => state.size);
@@ -323,7 +342,11 @@ export function Player({ look, spawn, heightAt }: PlayerProps) {
         position={[0, CAPSULE_HALF_HEIGHT + CAPSULE_RADIUS, 0]}
       />
       <group ref={visual} scale={0.94}>
-        <AvatarModel look={look} poseRef={poseRef} />
+        <AvatarModel
+          look={look}
+          poseRef={poseRef}
+          handItem={drink ? <Cup drink={drink} /> : undefined}
+        />
       </group>
     </RigidBody>
   );

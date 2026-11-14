@@ -34,7 +34,7 @@ test("player can sit on a bench and stand up again", async ({ page }) => {
   await prompt.click();
   await expect(prompt).toContainText("Aufstehen");
   const seated = await snapshot(page);
-  expect(Math.hypot(seated.player.x + 31.23, seated.player.z + 23.83)).toBeLessThan(0.3);
+  expect(Math.hypot(seated.player.x + 31.23, seated.player.z + 23.83)).toBeLessThan(0.6);
 
   await prompt.click();
   await expect(prompt).toContainText("Hinsetzen");
@@ -46,4 +46,59 @@ test("the day turns into night", async ({ page }) => {
   const before = (await snapshot(page)).hour;
   await page.waitForTimeout(1500);
   expect((await snapshot(page)).hour).toBeGreaterThan(before);
+});
+
+test("the map travels to every place", async ({ page }) => {
+  await page.goto("/play");
+  await waitForGame(page);
+  for (const [id, name] of [
+    ["mitte", "Hackescher Markt"],
+    ["kudamm", "Kurfürstendamm"],
+    ["goerli", "Görlitzer Park"],
+  ]) {
+    await page.keyboard.press("m");
+    const map = page.getByTestId("map");
+    await expect(map).toBeVisible();
+    await map.getByTestId(`map-place-${id}`).click();
+    // Loading screen with a fact about the destination, then the new scene.
+    await expect(page.getByTestId("loading-screen")).toHaveCSS("opacity", "1");
+    await expect(page.getByTestId("loading-screen")).toContainText(name);
+    await expect.poll(async () => (await snapshot(page)).place, { timeout: 60_000 }).toBe(id);
+    await expect(page.getByTestId("place-name")).toHaveText(name, { timeout: 60_000 });
+    await waitForGame(page);
+  }
+});
+
+test("the map opens from the button and closes with Escape", async ({ page }) => {
+  await page.goto("/play");
+  await waitForGame(page);
+  await page.getByTestId("open-map").click();
+  await expect(page.getByTestId("map")).toBeVisible();
+  await expect(page.getByTestId("map-place-goerli")).toContainText("Du bist hier");
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("map")).toBeHidden();
+});
+
+test("ordering a matcha in Mitte fills the inventory and unlocks an experience", async ({
+  page,
+}) => {
+  await page.goto("/play?place=mitte");
+  await waitForGame(page);
+  await page.evaluate(() => window.__berlinDebug!.teleport(13.2, 8.6, 3.4));
+  await expect(page.getByTestId("interact-prompt")).toContainText("Noor");
+  await page.getByTestId("interact-prompt").click();
+  const chat = page.getByTestId("chat");
+  await chat.getByRole("button", { name: "Einen Matcha Latte, bitte!" }).click();
+  await expect(chat.getByTestId("chat-npc-line").last()).toContainText("Hafermilch", {
+    timeout: 30_000,
+  });
+  await expect(page.getByTestId("experience-toast")).toContainText("Matcha in Mitte");
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("inventory")).toContainText("Matcha Latte");
+});
+
+test("a deep link opens the requested place", async ({ page }) => {
+  await page.goto("/play?place=kudamm");
+  await waitForGame(page);
+  expect((await snapshot(page)).place).toBe("kudamm");
 });

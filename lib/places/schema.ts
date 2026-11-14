@@ -43,6 +43,8 @@ export const seatSchema = z.object({
   ...point,
   heading: z.number(),
   mode: z.enum(["bench", "ground"]),
+  /** Experience unlocked the first time the player sits here. */
+  experience: z.string().optional(),
 });
 
 export const npcSpotSchema = z.object({
@@ -51,6 +53,8 @@ export const npcSpotSchema = z.object({
   heading: z.number(),
   pose: z.enum(["stand", "sit_ground", "sit_bench", "play_guitar"]).default("stand"),
   companion: z.enum(["dog"]).optional(),
+  /** How close the player must be to talk, in meters (more for someone behind a counter). */
+  reach: z.number().min(1).max(8).default(3),
 });
 export type NpcSpot = z.infer<typeof npcSpotSchema>;
 
@@ -88,6 +92,8 @@ export const placeSchema = z.object({
   shops: z.array(shopSchema).default([]),
   npcs: z.array(npcSpotSchema).default([]),
   experiences: z.array(experienceSchema).min(3).max(5),
+  /** Experience unlocked by sitting on any bench in this place. */
+  benchExperience: z.string().optional(),
   ambient: z.enum(["park", "cafe", "boulevard"]),
   /** Hour of day (0 to 24) when the player first arrives. */
   startHour: z.number().min(0).max(24).default(15),
@@ -105,6 +111,8 @@ export const manifestSchema = z.object({
   trees: z.array(z.tuple([z.number(), z.number(), z.number(), z.number()])),
   benches: z.array(z.tuple([z.number(), z.number(), z.number()])),
   lamps: z.array(z.tuple([z.number(), z.number()])),
+  /** Shop fronts snapped onto the nearest building wall: x, z, heading. Same order as the place's shops. */
+  shops: z.array(z.tuple([z.number(), z.number(), z.number()])).default([]),
   stats: z.object({
     buildings: z.number(),
     triangles: z.number(),

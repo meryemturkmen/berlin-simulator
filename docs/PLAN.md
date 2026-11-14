@@ -51,13 +51,13 @@ Checked items are done and verified. See `docs/PROGRESS.md` for the log and `doc
 
 ## M4: Map, teleport, Mitte and Ku'damm
 
-- [ ] District boundaries by script → simplified map data
-- [ ] Map overlay (key `M` and button) with place markers
-- [ ] Teleport with transition and loading screen with a Berlin fact
-- [ ] Lazy-loaded scene per place
-- [ ] Mitte: café corner, outdoor seating, barista, drink order → inventory and experience
-- [ ] Ku'damm: boulevard, shop fronts with invented names, benches, three NPCs
-- [ ] Acceptance: Playwright teleports to all three places; screenshots of all places reviewed
+- [x] District boundaries by script → simplified map data
+- [x] Map overlay (key `M` and button) with place markers
+- [x] Teleport with transition and loading screen with a Berlin fact
+- [x] Lazy-loaded scene per place
+- [x] Mitte: café corner, outdoor seating, barista, drink order → inventory and experience
+- [x] Ku'damm: boulevard, shop fronts with invented names, benches, three NPCs
+- [x] Acceptance: Playwright teleports to all three places; screenshots of all places reviewed
 
 ## M5: Supabase
 

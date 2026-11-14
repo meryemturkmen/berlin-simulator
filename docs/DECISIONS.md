@@ -61,3 +61,15 @@ The model must answer with JSON, but players should see text appear as it is gen
 ## D15: Where NPC memory lives
 
 Without Supabase the browser holds the memory (localStorage) and sends it with each turn; the server validates and bounds it. With Supabase (M5) the server loads and stores memory itself and ignores the client copy.
+
+## D16: District map from the Geoportal Berlin WFS
+
+District boundaries come from the "ALKIS Berlin Bezirke" WFS (dl-de/zero-2-0), simplified with Ramer-Douglas-Peucker at 90 m and stored as SVG path strings. Marker positions are projected in the build script so the client needs no projection library.
+
+## D17: Landmarks by building function
+
+LoD2 buildings carry an ALKIS function code. Churches, memorials, station buildings and canopies get their own colors and no generic window grid, so the Memorial Church and the Hackescher Markt viaduct read as what they are without any hand modeling.
+
+## D18: Shops are set dressing on real walls
+
+Shop fronts (sign, windows, door, awning) with invented names are placed roughly in the place definition and snapped onto the nearest LoD2 wall by the pipeline. No real shop or brand is represented.

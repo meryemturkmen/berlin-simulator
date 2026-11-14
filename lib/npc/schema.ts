@@ -15,6 +15,7 @@ export const ACTION_IDS = [
   "play_song",
   "pet_dog",
   "take_photo",
+  "draw_sketch",
   "show_window",
   "tell_story",
 ] as const;

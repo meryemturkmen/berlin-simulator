@@ -85,6 +85,10 @@ export function osmBuildings(osm: OsmData, reach: number): Building[] {
     const lift = (ring: [number, number][]): Vec3[] => ring.map(([x, z]) => [x, height, z]);
     buildings.push({
       id: area.id,
+      function:
+        area.tags.amenity === "place_of_worship" || area.tags.building === "church"
+          ? "31001_3041"
+          : "",
       walls,
       roofs: [{ outer: lift(area.outer), holes: area.holes.map(lift) }],
       bounds,
@@ -109,6 +113,21 @@ export async function loadBuildings(
 }
 
 /**
+ * Special looks by ALKIS building function, so landmarks do not get the
+ * generic "apartment block with windows" treatment.
+ */
+const FUNCTION_STYLES: { pattern: RegExp; wall: string; roof: string; windows: boolean }[] = [
+  // Cultural buildings and memorials (e.g. the Memorial Church ruin): weathered stone.
+  { pattern: /^31001_303\d$/, wall: "#a3968a", roof: "#6f6a68", windows: false },
+  // Churches and chapels: cool blue-gray, like the glass blocks of the new Memorial Church.
+  { pattern: /^31001_304\d$/, wall: "#8296b3", roof: "#5f6f88", windows: false },
+  // Railway station buildings: red brick.
+  { pattern: /^31001_309\d$/, wall: "#b9654a", roof: "#6f6a68", windows: true },
+  // Canopies and bridges: plain concrete.
+  { pattern: /^(51009_1610|53001_\d+)$/, wall: "#cfc8bc", roof: "#b9b2a6", windows: false },
+];
+
+/**
  * Appends all buildings to one mesh.
  * Extra attribute per vertex: [u along wall (m), height above ground (m),
  * wall width (m, 0 for roofs and tilted faces), height of the wall's top edge (m)].
@@ -121,15 +140,21 @@ export function buildBuildingMesh(place: Place, buildings: Building[]): MeshBuil
   for (const building of buildings) {
     const hash = hashString(building.id);
     const tint = 0.94 + ((hash >>> 10) % 100) / 100 / 8;
-    const wallColor = scaleColor(wallColors[hash % wallColors.length], tint);
-    const roofColor = scaleColor(roofColors[(hash >>> 5) % roofColors.length], tint);
+    const style = FUNCTION_STYLES.find((candidate) => candidate.pattern.test(building.function));
+    const wallColor = style
+      ? hexToLinear(style.wall)
+      : scaleColor(wallColors[hash % wallColors.length], tint);
+    const roofColor = style
+      ? hexToLinear(style.roof)
+      : scaleColor(roofColors[(hash >>> 5) % roofColors.length], tint);
+    const windows = style?.windows ?? true;
 
     for (const wall of building.walls) {
       const result = triangulatePlanar(wall.outer, wall.holes);
       if (!result) continue;
       // Steeply tilted "walls" (dormer cheeks etc.) still count as walls, but
       // only upright ones get a window layout.
-      const upright = Math.abs(result.normal[1]) < 0.3;
+      const upright = windows && Math.abs(result.normal[1]) < 0.3;
       let minU = Infinity;
       let maxU = -Infinity;
       let top = 0;

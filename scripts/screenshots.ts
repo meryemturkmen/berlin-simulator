@@ -72,6 +72,69 @@ const SHOTS: Shot[] = [
       await debug(page, "__berlinDebug.setCamera(2.2 + Math.PI + 0.4, 0.16, 6)");
     },
   },
+  {
+    name: "goerli-chat",
+    path: "/play?hour=16.5",
+    game: true,
+    stage: async (page) => {
+      await debug(page, "__berlinDebug.setHour(16.5, 0); __berlinDebug.teleport(-6.5, 10.6, 0.55)");
+      await page.waitForTimeout(1200);
+      await page.getByTestId("interact-prompt").click();
+      await page.getByTestId("chat").getByRole("textbox").fill("Spielst du mir was vor?");
+      await page.keyboard.press("Enter");
+      await page.waitForTimeout(2500);
+    },
+  },
+  {
+    name: "map",
+    path: "/play",
+    game: true,
+    stage: async (page) => {
+      await page.getByTestId("open-map").click();
+    },
+  },
+  {
+    name: "mitte-cafe",
+    path: "/play?place=mitte&hour=11",
+    game: true,
+    stage: async (page) => {
+      await debug(page, "__berlinDebug.setHour(11, 0); __berlinDebug.teleport(14.5, 11.5, 3.5)");
+      await page.waitForTimeout(600);
+      await debug(page, "__berlinDebug.setCamera(3.5 + Math.PI - 0.35, 0.14, 6.5)");
+    },
+  },
+  {
+    name: "mitte-terrace",
+    path: "/play?place=mitte&hour=17.5",
+    game: true,
+    stage: async (page) => {
+      await debug(page, "__berlinDebug.setHour(17.5, 0); __berlinDebug.teleport(4.2, 22.2, 0)");
+      await page.waitForTimeout(1200);
+      await page.getByTestId("interact-prompt").click();
+      await page.waitForTimeout(1200);
+      await debug(page, "__berlinDebug.setCamera(0.9, 0.2, 4.8)");
+    },
+  },
+  {
+    name: "kudamm-church",
+    path: "/play?place=kudamm&hour=15",
+    game: true,
+    stage: async (page) => {
+      await debug(page, "__berlinDebug.setHour(15, 0); __berlinDebug.teleport(-2, 50, 3.0)");
+      await page.waitForTimeout(600);
+      await debug(page, "__berlinDebug.setCamera(3.0 + Math.PI, 0.03, 7.5)");
+    },
+  },
+  {
+    name: "kudamm-shops",
+    path: "/play?place=kudamm&hour=20.6",
+    game: true,
+    stage: async (page) => {
+      await debug(page, "__berlinDebug.setHour(20.6, 0); __berlinDebug.teleport(-45, 55, 0.3)");
+      await page.waitForTimeout(600);
+      await debug(page, "__berlinDebug.setCamera(0.3 + Math.PI + 0.2, 0.06, 8)");
+    },
+  },
 ];
 
 const VIEWPORTS = [

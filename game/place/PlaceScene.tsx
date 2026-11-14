@@ -11,13 +11,14 @@ import {
   type Interactable,
 } from "@/game/interact/registry";
 import { runtime } from "@/game/runtime";
+import { useAlbum } from "@/game/store/album";
 import { usePlayer } from "@/game/store/player";
 import type { Place } from "@/lib/places/schema";
 import { terrainHeight } from "@/lib/places/terrain";
 import { getNpc } from "@/content/npcs";
 import { Npc } from "@/game/npc/Npc";
 import { createPlaceMaterials } from "./materials";
-import { Props } from "./Props";
+import { Props, Shops } from "./Props";
 import { Benches, Lamps, Trees } from "./Scenery";
 import { usePlaceAssets } from "./usePlaceAssets";
 
@@ -92,9 +93,19 @@ export default function PlaceScene({ place, shadows, treeDensity, onReady }: Pla
           ),
     [manifest.trees, half, treeDensity],
   );
+  // Mapped benches in reach plus benches placed by hand in the place definition.
+  const allBenches = useMemo(
+    () => [
+      ...manifest.benches,
+      ...place.props
+        .filter((prop) => prop.type === "bench")
+        .map((prop): [number, number, number] => [prop.x, prop.z, prop.rotation]),
+    ],
+    [manifest.benches, place.props],
+  );
   const nearBenches = useMemo(
-    () => manifest.benches.filter(([x, z]) => Math.abs(x) < half && Math.abs(z) < half),
-    [manifest.benches, half],
+    () => allBenches.filter(([x, z]) => Math.abs(x) < half && Math.abs(z) < half),
+    [allBenches, half],
   );
 
   // Seats: every bench in reach plus the extra seats (picnic blankets) of the place.
@@ -108,13 +119,20 @@ export default function PlaceScene({ place, shadows, treeDensity, onReady }: Pla
           radius: 1.8,
           label: "interact.sit",
           priority: 1,
-          onInteract: () =>
+          onInteract: () => {
+            // Sit on the right half so someone can already be sitting on the left.
             usePlayer.getState().sit({
               id: `bench-${index}`,
-              position: [x + Math.sin(heading) * 0.06, y, z + Math.cos(heading) * 0.06],
+              position: [
+                x + Math.sin(heading) * 0.06 + Math.cos(heading) * 0.42,
+                y,
+                z + Math.cos(heading) * 0.06 - Math.sin(heading) * 0.42,
+              ],
               heading,
               mode: "bench",
-            }),
+            });
+            if (place.benchExperience) useAlbum.getState().unlock(place.benchExperience);
+          },
         };
       }),
       ...place.seats.map((seat): Interactable => {
@@ -125,18 +143,20 @@ export default function PlaceScene({ place, shadows, treeDensity, onReady }: Pla
           radius: 2,
           label: "interact.sit",
           priority: 1,
-          onInteract: () =>
+          onInteract: () => {
             usePlayer.getState().sit({
               id: seat.id,
               position: [seat.x, y + (seat.mode === "ground" ? 0.04 : 0), seat.z],
               heading: seat.heading,
               mode: seat.mode,
-            }),
+            });
+            if (seat.experience) useAlbum.getState().unlock(seat.experience);
+          },
         };
       }),
     ];
     return registerInteractables(seats);
-  }, [nearBenches, place.seats, heightAt]);
+  }, [nearBenches, place.seats, place.benchExperience, heightAt]);
 
   useEffect(() => {
     onReady();
@@ -177,9 +197,10 @@ export default function PlaceScene({ place, shadows, treeDensity, onReady }: Pla
     <>
       <primitive object={scene} />
       <Trees trees={drawnTrees} palette={place.palette} heightAt={heightAt} castShadow={shadows} />
-      <Benches benches={manifest.benches} heightAt={heightAt} />
+      <Benches benches={allBenches} heightAt={heightAt} />
       <Lamps lamps={manifest.lamps} heightAt={heightAt} />
       <Props props={place.props} heightAt={heightAt} />
+      <Shops shops={place.shops} placements={manifest.shops} />
       {place.npcs.map((spot) => {
         const npc = getNpc(spot.npc);
         return npc ? (

@@ -2,6 +2,16 @@
 
 Newest entry first.
 
+## M4: Map, teleport, Mitte and Ku'damm (done)
+
+- `scripts/build_map.ts`: district boundaries from the Geoportal Berlin WFS, simplified to 11 kB of SVG paths, with place markers.
+- Map overlay (key `M` or button): districts, markers, place cards. Picking a place shows a loading screen with a Berlin fact, then the new scene. `?place=` deep links, last place is remembered.
+- Hackescher Markt (Mitte): red-brick railway viaduct, Café Bogenlicht with a coffee counter, terrace tables with parasols, barista Noor (matcha or coffee lands in the inventory and in the player's hand), illustrator Henrik.
+- Kurfürstendamm (Charlottenburg): Breitscheidplatz with the Memorial Church, boulevard, three invented shop fronts with lit windows at night, benches; shop assistant Carla, tourist Diego, lifelong local Herr Lehmann.
+- Pipeline additions: building function codes drive landmark looks (church, station, canopies), shop fronts are snapped onto real walls, hand-placed benches join the instanced ones.
+- Seats and benches can unlock experiences; 12 experiences across three places.
+- 133 unit tests, 17 Playwright scenarios per viewport.
+
 ## M3: NPC role play (done)
 
 - NPC definitions in `content/npcs/*.json`, validated with Zod (persona, speech style with dialect 0 to 3, knowledge, goals, mood, boundaries, actions, look, greetings, mock script).

@@ -27,6 +27,9 @@ const ACTION_EMOJI: Record<string, string> = {
   serve_matcha: "🍵",
   serve_coffee: "☕",
   take_photo: "📸",
+  draw_sketch: "✏️",
+  tell_story: "📻",
+  show_window: "🛍️",
   wave: "👋",
 };
 
@@ -83,7 +86,7 @@ export function Npc({ npc, spot, y }: NpcProps) {
         {
           id: `npc-${npc.id}`,
           position: [spot.x, y, spot.z],
-          radius: 3,
+          radius: spot.reach,
           label: "interact.talk",
           name: npc.name,
           priority: 2,

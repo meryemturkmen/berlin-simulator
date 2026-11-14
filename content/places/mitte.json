@@ -1,0 +1,228 @@
+{
+  "id": "mitte",
+  "name": {
+    "de": "Hackescher Markt",
+    "en": "Hackescher Markt"
+  },
+  "district": {
+    "de": "Mitte",
+    "en": "Mitte"
+  },
+  "tagline": {
+    "de": "Café-Ecke unter den S-Bahn-Bögen",
+    "en": "A café corner by the railway arches"
+  },
+  "center": {
+    "lat": 52.5225,
+    "lon": 13.402
+  },
+  "halfSize": 110,
+  "backdrop": 70,
+  "palette": {
+    "ground": "#ded6c8",
+    "grass": ["#93bf73", "#a0c97c", "#86b468"],
+    "path": "#e4d9c2",
+    "plaza": "#e8dfcd",
+    "road": "#8b8a92",
+    "curb": "#c8c2b8",
+    "water": "#6fb2d2",
+    "walls": ["#f1d9b5", "#eec4a4", "#f5e7cc", "#e6b79c", "#d9d2c0", "#f0cfc0", "#cfd8d2"],
+    "roofs": ["#a8563f", "#8f5a4c", "#6f7078", "#8b909a"],
+    "foliage": ["#6aa457", "#7cb35c", "#5a944f"],
+    "trunk": "#7a5a43"
+  },
+  "terrain": [],
+  "scatterTrees": 0,
+  "spawn": {
+    "x": -7,
+    "z": 31,
+    "heading": 2.8
+  },
+  "facts": [
+    {
+      "de": "Die Hackeschen Höfe gleich nebenan sind acht miteinander verbundene Hinterhöfe. Der erste ist mit bunten Jugendstil-Kacheln verkleidet.",
+      "en": "The Hackesche Höfe next door are eight connected courtyards. The first is clad in colorful Art Nouveau tiles."
+    },
+    {
+      "de": "Der Bahnhof Hackescher Markt von 1882 steht unter Denkmalschutz. Die S-Bahn fährt hier auf gemauerten Viaduktbögen mitten durch die Stadt.",
+      "en": "Hackescher Markt station from 1882 is a listed building. The S-Bahn runs through the city here on brick viaduct arches."
+    },
+    {
+      "de": "Der Platz ist nach Hans Christoph Friedrich Graf von Hacke benannt, der ihn um 1750 anlegen ließ.",
+      "en": "The square is named after Count Hans Christoph Friedrich von Hacke, who had it laid out around 1750."
+    }
+  ],
+  "experiences": [
+    {
+      "id": "mitte_matcha",
+      "icon": "🍵",
+      "title": {
+        "de": "Matcha in Mitte",
+        "en": "Matcha in Mitte"
+      },
+      "description": {
+        "de": "Einen Matcha Latte bestellt und in der Sonne getrunken.",
+        "en": "Ordered a matcha latte and drank it in the sun."
+      }
+    },
+    {
+      "id": "mitte_coffee",
+      "icon": "☕",
+      "title": {
+        "de": "Kaffee am Hackeschen Markt",
+        "en": "Coffee at Hackescher Markt"
+      },
+      "description": {
+        "de": "Ein Kaffee unter den S-Bahn-Bögen.",
+        "en": "A coffee beneath the railway arches."
+      }
+    },
+    {
+      "id": "mitte_terrace",
+      "icon": "🪑",
+      "title": {
+        "de": "Platz an der Sonne",
+        "en": "A seat in the sun"
+      },
+      "description": {
+        "de": "Einen freien Stuhl auf der Café-Terrasse ergattert.",
+        "en": "Grabbed a free chair on the café terrace."
+      }
+    },
+    {
+      "id": "mitte_sketch",
+      "icon": "✏️",
+      "title": {
+        "de": "Porträt in zwei Minuten",
+        "en": "A portrait in two minutes"
+      },
+      "description": {
+        "de": "Vom Zeichner am Platz skizziert worden.",
+        "en": "Got sketched by the illustrator on the square."
+      }
+    }
+  ],
+  "ambient": "cafe",
+  "startHour": 11,
+  "props": [
+    {
+      "type": "market_stall",
+      "x": 12.4,
+      "z": 5.84,
+      "rotation": 0.27,
+      "color": "#2f5d62",
+      "text": "Matcha · Kaffee"
+    },
+    {
+      "type": "cafe_table",
+      "x": 3,
+      "z": 23,
+      "rotation": 0.2
+    },
+    {
+      "type": "parasol",
+      "x": 3,
+      "z": 23,
+      "rotation": 0,
+      "color": "#e4604a"
+    },
+    {
+      "type": "cafe_table",
+      "x": 10,
+      "z": 25,
+      "rotation": -0.3
+    },
+    {
+      "type": "cafe_table",
+      "x": 17,
+      "z": 22.5,
+      "rotation": 0.5
+    },
+    {
+      "type": "parasol",
+      "x": 17,
+      "z": 22.5,
+      "rotation": 0,
+      "color": "#f3b95f"
+    },
+    {
+      "type": "cafe_table",
+      "x": 24,
+      "z": 24.5,
+      "rotation": 0.1
+    },
+    {
+      "type": "planter",
+      "x": -3,
+      "z": 20.5,
+      "rotation": 0
+    },
+    {
+      "type": "planter",
+      "x": 30,
+      "z": 21,
+      "rotation": 0
+    }
+  ],
+  "seats": [
+    {
+      "id": "cafe-1",
+      "x": 3.74,
+      "z": 22.85,
+      "heading": -1.37,
+      "mode": "bench",
+      "experience": "mitte_terrace"
+    },
+    {
+      "id": "cafe-2",
+      "x": 10.72,
+      "z": 25.22,
+      "heading": -1.87,
+      "mode": "bench",
+      "experience": "mitte_terrace"
+    },
+    {
+      "id": "cafe-3",
+      "x": 17.66,
+      "z": 22.14,
+      "heading": -1.07,
+      "mode": "bench",
+      "experience": "mitte_terrace"
+    },
+    {
+      "id": "cafe-4",
+      "x": 24.75,
+      "z": 24.43,
+      "heading": -1.47,
+      "mode": "bench",
+      "experience": "mitte_terrace"
+    }
+  ],
+  "npcs": [
+    {
+      "npc": "noor",
+      "x": 12.11,
+      "z": 4.78,
+      "heading": 0.27,
+      "pose": "stand",
+      "reach": 4.6
+    },
+    {
+      "npc": "henrik",
+      "x": -15,
+      "z": 25,
+      "heading": 1.2,
+      "pose": "stand"
+    }
+  ],
+  "shops": [
+    {
+      "name": "Café Bogenlicht",
+      "x": 12,
+      "z": 3.24,
+      "heading": 0.27,
+      "color": "#2f5d62",
+      "awning": true
+    }
+  ]
+}

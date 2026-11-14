@@ -20,6 +20,8 @@ const ACTION_DURATION: Partial<Record<ActionId, number>> = {
   serve_matcha: 2600,
   serve_coffee: 2600,
   take_photo: 2600,
+  draw_sketch: 4000,
+  tell_story: 4000,
   show_window: 2600,
 };
 

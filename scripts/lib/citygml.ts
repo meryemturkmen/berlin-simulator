@@ -10,6 +10,8 @@ export interface Polygon3 {
 
 export interface Building {
   id: string;
+  /** ALKIS function code, e.g. "31001_3041" for a church. Empty if not given. */
+  function: string;
   walls: Polygon3[];
   roofs: Polygon3[];
   /** Footprint bounds in local X/Z. */
@@ -42,7 +44,7 @@ export async function readBuildings(
   reach: number,
 ): Promise<Building[]> {
   const buildings: Building[] = [];
-  let current: { id: string; walls: Polygon3[]; roofs: Polygon3[] } | null = null;
+  let current: { id: string; function: string; walls: Polygon3[]; roofs: Polygon3[] } | null = null;
   let buildingDepth = 0;
   let surface: SurfaceKind | null = null;
   let polygon: Polygon3 | null = null;
@@ -67,6 +69,7 @@ export async function readBuildings(
   const finish = () => {
     if (!current) return;
     const { id, walls, roofs } = current;
+    const functionCode = current.function;
     current = null;
     let minX = Infinity;
     let maxX = -Infinity;
@@ -91,6 +94,7 @@ export async function readBuildings(
     }
     buildings.push({
       id,
+      function: functionCode,
       walls,
       roofs,
       bounds: { minX, maxX, minZ, maxZ },
@@ -106,6 +110,7 @@ export async function readBuildings(
         if (buildingDepth === 0) {
           current = {
             id: String(tag.attributes["gml:id"] ?? buildings.length),
+            function: "",
             walls: [],
             roofs: [],
           };
@@ -124,6 +129,9 @@ export async function readBuildings(
       case "gml:posList":
         if (polygon) text = "";
         return;
+      case "bldg:function":
+        if (current && !current.function) text = "";
+        return;
     }
     if (tag.name in SURFACE_KINDS) surface = SURFACE_KINDS[tag.name];
   });
@@ -138,6 +146,10 @@ export async function readBuildings(
           if (ringRole === "hole") polygon.holes.push(ring);
           else polygon.outer = ring;
         }
+        text = null;
+        return;
+      case "bldg:function":
+        if (current && text !== null) current.function = text.trim();
         text = null;
         return;
       case "gml:Polygon":

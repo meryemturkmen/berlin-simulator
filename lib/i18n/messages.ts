@@ -70,6 +70,14 @@ const de = {
     "Heute war richtig viel los im Kiez, alle sind müde gequatscht. Komm morgen wieder!",
   "chat.unavailable": "Gerade ist es zu laut zum Reden. Versuch's gleich noch mal.",
   "album.unlocked": "Neues Erlebnis",
+  "map.title": "Wohin soll's gehen?",
+  "map.subtitle": "Tippe auf einen Ort, um dorthin zu reisen.",
+  "map.open": "Karte",
+  "map.here": "Du bist hier",
+  "map.travel": "Hinreisen",
+  "map.label": "Karte von Berlin mit Bezirken",
+  "item.matcha": "Matcha Latte",
+  "item.coffee": "Kaffee",
 } as const;
 
 export type MessageKey = keyof typeof de;
@@ -142,6 +150,14 @@ const en: Record<MessageKey, string> = {
     "It's been a busy day around here and everyone is talked out. Come back tomorrow!",
   "chat.unavailable": "It's too noisy to talk right now. Try again in a moment.",
   "album.unlocked": "New experience",
+  "map.title": "Where to?",
+  "map.subtitle": "Tap a place to travel there.",
+  "map.open": "Map",
+  "map.here": "You are here",
+  "map.travel": "Travel here",
+  "map.label": "Map of Berlin with its districts",
+  "item.matcha": "Matcha latte",
+  "item.coffee": "Coffee",
 };
 
 export const messages: Record<Language, Record<MessageKey, string>> = { de, en };

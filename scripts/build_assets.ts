@@ -4,6 +4,7 @@
  *   --force          re-download raw data even if cached in data/raw
  *   --osm-buildings  skip LoD2 and extrude OpenStreetMap footprints instead
  */
+import { buildMap } from "./build_map";
 import { buildPlace } from "./build_place";
 import { fetchLod2 } from "./fetch_lod2";
 import { fetchOsm } from "./fetch_osm";
@@ -24,5 +25,6 @@ runMain(import.meta.url, async () => {
   }
   await fetchOsm(places, force);
   for (const place of places) await buildPlace(place, osmBuildings);
+  await buildMap(force);
   log("assets", `done: ${places.map((place) => place.id).join(", ")}`);
 });

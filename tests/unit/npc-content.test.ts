@@ -31,7 +31,7 @@ describe("NPC definitions", () => {
   });
 
   it("rejects mock rules that use actions the NPC does not have", () => {
-    const broken = structuredClone(NPCS[0]) as unknown as Record<string, never>;
+    const broken = structuredClone(getNpc("jule")!) as unknown as Record<string, never>;
     (
       broken as unknown as { mock: { de: { rules: { action: string }[] } } }
     ).mock.de.rules[0].action = "serve_matcha";

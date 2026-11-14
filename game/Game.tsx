@@ -9,6 +9,7 @@ import * as THREE from "three";
 import { ChatOverlay } from "@/components/chat/ChatOverlay";
 import { ExperienceToast } from "@/components/hud/ExperienceToast";
 import { Hud } from "@/components/hud/Hud";
+import { MapOverlay } from "@/components/map/MapOverlay";
 import { LoadingScreen } from "@/components/hud/LoadingScreen";
 import { getPlace, PLACES } from "@/content/places";
 import { terrainHeight } from "@/lib/places/terrain";
@@ -116,6 +117,7 @@ export default function Game() {
           <Hud place={place} />
           <ExperienceToast place={place} />
           <ChatOverlay />
+          <MapOverlay />
         </>
       )}
       <LoadingScreen place={place} factIndex={factIndex} visible={phase === "loading"} />

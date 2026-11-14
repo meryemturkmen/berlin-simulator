@@ -487,11 +487,18 @@ function buildEnvironment(place: Place, osm: OsmData, buildings: Building[]): Sc
     );
   }
 
+  // Footprints: the bottom edge of every upright wall.
   for (const building of buildings) {
-    const { minX, maxX, minZ, maxZ } = building.bounds;
-    debug.push(
-      `<rect x="${minX.toFixed(1)}" y="${minZ.toFixed(1)}" width="${(maxX - minX).toFixed(1)}" height="${(maxZ - minZ).toFixed(1)}" fill="#c9a58a" fill-opacity="0.55" stroke="#7a5a43" stroke-width="0.3"/>`,
-    );
+    const edges: string[] = [];
+    for (const wall of building.walls) {
+      const low = wall.outer.filter((vertex) => vertex[1] < 1.5);
+      if (low.length < 2) continue;
+      const [from, to] = [low[0], low[low.length - 1]];
+      edges.push(
+        `M${from[0].toFixed(1)},${from[2].toFixed(1)}L${to[0].toFixed(1)},${to[2].toFixed(1)}`,
+      );
+    }
+    debug.push(`<path d="${edges.join("")}" fill="none" stroke="#5a3a28" stroke-width="0.8"/>`);
   }
   for (const [x, z, scale] of trees)
     debug.push(
@@ -555,6 +562,63 @@ function writeDebugSvg(place: Place, scene: Scene) {
   writeFileSync(join(ensureDir(join(RAW_DIR, "debug")), `${place.id}.svg`), svg);
 }
 
+/**
+ * Snaps each shop front onto the building wall behind it, so signs and
+ * windows sit flush on the facade whatever the footprint looks like.
+ * The definition gives a rough position and facing; we walk back from 10 m in
+ * front of it and take the first wall we hit.
+ */
+function snapShops(place: Place, buildings: Building[]): PlaceManifest["shops"] {
+  const segments: [Vec2, Vec2][] = [];
+  for (const building of buildings) {
+    for (const wall of building.walls) {
+      const low = wall.outer.filter((vertex) => vertex[1] < 1.5);
+      if (low.length < 2) continue;
+      const [a, b] = [low[0], low[low.length - 1]];
+      segments.push([
+        [a[0], a[2]],
+        [b[0], b[2]],
+      ]);
+    }
+  }
+  return place.shops.map((shop) => {
+    const normal: Vec2 = [Math.sin(shop.heading), Math.cos(shop.heading)];
+    const origin: Vec2 = [shop.x + normal[0] * 10, shop.z + normal[1] * 10];
+    let best = Infinity;
+    let heading = shop.heading;
+    for (const [a, b] of segments) {
+      // Ray origin - t * normal against segment a + u * (b - a).
+      const ex = b[0] - a[0];
+      const ez = b[1] - a[1];
+      const denominator = -normal[0] * ez + normal[1] * ex;
+      if (Math.abs(denominator) < 1e-6) continue;
+      const t = ((a[0] - origin[0]) * ez - (a[1] - origin[1]) * ex) / denominator;
+      const u = (-(a[0] - origin[0]) * normal[1] + (a[1] - origin[1]) * normal[0]) / denominator;
+      if (t <= 0 || t >= best || t > 25 || u < 0 || u > 1) continue;
+      best = t;
+      // Wall normal on the side the shop faces.
+      const length = Math.hypot(ex, ez) || 1;
+      let nx = -ez / length;
+      let nz = ex / length;
+      if (nx * normal[0] + nz * normal[1] < 0) {
+        nx = -nx;
+        nz = -nz;
+      }
+      heading = Math.atan2(nx, nz);
+    }
+    if (!Number.isFinite(best)) {
+      log("shops", `${place.id}: no wall found behind "${shop.name}", keeping its position`);
+      return [shop.x, shop.z, shop.heading];
+    }
+    const out = 0.12;
+    return [
+      round(origin[0] - normal[0] * best + Math.sin(heading) * out),
+      round(origin[1] - normal[1] * best + Math.cos(heading) * out),
+      round(heading),
+    ];
+  });
+}
+
 export async function buildPlace(place: Place, forceOsmBuildings = false): Promise<void> {
   const osm = parseOsm(readFileSync(osmFile(place), "utf8"), frameFor(place));
   const { source, buildings } = await loadBuildings(place, osm, forceOsmBuildings);
@@ -573,6 +637,7 @@ export async function buildPlace(place: Place, forceOsmBuildings = false): Promi
     trees: scene.trees,
     benches: scene.benches,
     lamps: scene.lamps,
+    shops: snapShops(place, buildings),
     stats: { buildings: buildings.length, triangles, glbBytes, buildingSource: source },
   };
   writeFileSync(join(directory, `${place.id}.json`), JSON.stringify(manifest));

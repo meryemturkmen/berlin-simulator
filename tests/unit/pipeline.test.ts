@@ -11,6 +11,10 @@ import {
 } from "@/scripts/lib/mesh";
 import { parseOsm } from "@/scripts/lib/osm";
 import { osmBuildings } from "@/scripts/build_buildings";
+import { simplify, simplifyRing } from "@/scripts/build_map";
+import { berlinMapSchema } from "@/lib/places/map";
+import rawMap from "@/public/assets/map/berlin.json";
+import { PLACES } from "@/content/places";
 
 const goerli = getPlace("goerli")!;
 
@@ -150,5 +154,48 @@ describe("OSM parsing", () => {
     expect(building.height).toBeCloseTo(5 * 3.2 + 1);
     expect(building.walls).toHaveLength(4);
     expect(building.roofs).toHaveLength(1);
+  });
+});
+
+describe("Berlin map", () => {
+  it("drops points that lie on a straight line", () => {
+    expect(
+      simplify(
+        [
+          [0, 0],
+          [5, 0.1],
+          [10, 0],
+          [10, 10],
+        ],
+        1,
+      ),
+    ).toEqual([
+      [0, 0],
+      [10, 0],
+      [10, 10],
+    ]);
+  });
+
+  it("keeps the shape of a closed ring", () => {
+    const square: [number, number][] = [];
+    for (let i = 0; i <= 10; i++) square.push([i, 0]);
+    for (let i = 1; i <= 10; i++) square.push([10, i]);
+    for (let i = 9; i >= 0; i--) square.push([i, 10]);
+    for (let i = 9; i >= 1; i--) square.push([0, i]);
+    expect(simplifyRing(square, 0.5)).toHaveLength(4);
+  });
+
+  it("has all twelve districts and a marker for every place", () => {
+    const map = berlinMapSchema.parse(rawMap);
+    expect(map.districts).toHaveLength(12);
+    expect(map.places.map((place) => place.id).sort()).toEqual(
+      PLACES.map((place) => place.id).sort(),
+    );
+    for (const marker of map.places) {
+      expect(marker.x).toBeGreaterThan(0);
+      expect(marker.x).toBeLessThan(map.width);
+      expect(marker.y).toBeGreaterThan(0);
+      expect(marker.y).toBeLessThan(map.height);
+    }
   });
 });

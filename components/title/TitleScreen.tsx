@@ -47,13 +47,19 @@ export function TitleScreen() {
           >
             {t("title.play")}
           </Link>
-          <div className="flex gap-5 text-base font-medium">
+          <div className="flex gap-3 text-base font-medium">
             {hasAvatar && (
-              <Link href="/avatar" className="underline-offset-4 hover:underline">
+              <Link
+                href="/avatar"
+                className="inline-flex min-h-11 items-center px-2 underline-offset-4 hover:underline"
+              >
                 {t("title.editAvatar")}
               </Link>
             )}
-            <Link href="/about" className="underline-offset-4 hover:underline">
+            <Link
+              href="/about"
+              className="inline-flex min-h-11 items-center px-2 underline-offset-4 hover:underline"
+            >
               {t("title.about")}
             </Link>
           </div>

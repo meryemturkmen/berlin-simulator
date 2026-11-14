@@ -47,3 +47,14 @@ test("player can create an avatar and walk", async ({ page }) => {
   await createAvatarAndPlay(page);
   expect(await walkForward(page, 1.5)).toBeGreaterThan(1.5);
 });
+
+test("about page explains the project and renders the architecture diagram", async ({ page }) => {
+  await page.goto("/about");
+  await expect(page.getByRole("heading", { name: "Berlin Simulator" })).toBeVisible();
+  await expect(page.getByText("© OpenStreetMap-Mitwirkende, ODbL")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Quellcode auf GitHub" })).toHaveAttribute(
+    "href",
+    "https://github.com/meryemturkmen/berlin-simulator",
+  );
+  await expect(page.getByTestId("architecture-diagram").locator("svg")).toBeVisible();
+});

@@ -20,7 +20,7 @@ export function LanguageToggle({ className = "" }: { className?: string }) {
           type="button"
           aria-pressed={language === code}
           onClick={() => setLanguage(code)}
-          className={`min-h-9 min-w-11 rounded-full px-3 text-sm font-semibold uppercase transition-colors ${
+          className={`min-h-11 min-w-12 rounded-full px-3 text-sm font-semibold uppercase transition-colors ${
             language === code ? "bg-ink text-paper" : "text-ink-soft hover:text-ink"
           }`}
         >

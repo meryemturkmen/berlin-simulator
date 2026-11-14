@@ -25,6 +25,47 @@ function Clock() {
   return <span className="tabular-nums">{time}</span>;
 }
 
+/** A round HUD button. Compact ones show only the icon, with the label for screen readers. */
+function HudButton({
+  testId,
+  icon,
+  label,
+  hotkey,
+  badge,
+  compact = false,
+  onClick,
+}: {
+  testId: string;
+  icon: string;
+  label: string;
+  hotkey?: string;
+  badge?: string;
+  compact?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      data-testid={testId}
+      onClick={onClick}
+      aria-label={compact ? label : undefined}
+      title={compact ? label : undefined}
+      className={`text-ink relative flex min-h-11 items-center gap-2 rounded-full bg-white/90 text-base font-semibold shadow-md backdrop-blur hover:bg-white ${
+        compact ? "min-w-11 justify-center px-2" : "px-4"
+      }`}
+    >
+      <span aria-hidden="true">{icon}</span>
+      {!compact && <span className="max-sm:sr-only">{label}</span>}
+      {hotkey && <kbd className="bg-ink/10 rounded px-1.5 text-xs font-bold">{hotkey}</kbd>}
+      {badge && (
+        <span className="bg-coral-deep absolute -top-1 -right-1 grid min-w-5 place-items-center rounded-full px-1 text-xs font-bold text-white">
+          {badge}
+        </span>
+      )}
+    </button>
+  );
+}
+
 function isTyping(target: EventTarget | null): boolean {
   return (
     target instanceof HTMLElement &&
@@ -41,6 +82,8 @@ export function Hud({ place }: { place: Place }) {
   const seated = usePlayer((state) => state.seat !== null);
   const frozen = usePlayer((state) => state.frozen);
   const inventory = useAlbum((state) => state.inventory);
+  const unlockedCount = useAlbum((state) => state.unlocked.length);
+  const muted = useSettings((state) => state.muted);
 
   const prompt = seated
     ? { label: t("interact.stand"), run: () => usePlayer.getState().stand() }
@@ -57,6 +100,11 @@ export function Hud({ place }: { place: Place }) {
       if (event.repeat || isTyping(event.target)) return;
       if (event.code === "KeyM" && !useChat.getState().npc) {
         useWorld.getState().setMapOpen(!useWorld.getState().mapOpen);
+        return;
+      }
+      if (event.code === "KeyB" && !useChat.getState().npc) {
+        const world = useWorld.getState();
+        world.setPanel(world.panel === "album" ? null : "album");
         return;
       }
       if (event.code !== "KeyE") return;
@@ -91,17 +139,36 @@ export function Hud({ place }: { place: Place }) {
       </div>
 
       {!frozen && (
-        <div data-ui className="absolute top-3 right-3 flex gap-2">
-          <button
-            type="button"
-            data-testid="open-map"
+        <div data-ui className="absolute top-3 right-3 flex flex-wrap justify-end gap-2 pl-44">
+          <HudButton
+            testId="open-map"
+            icon="🗺️"
+            label={t("map.open")}
+            hotkey={isTouch ? undefined : "M"}
             onClick={() => useWorld.getState().setMapOpen(true)}
-            className="text-ink flex min-h-11 items-center gap-2 rounded-full bg-white/90 px-4 text-base font-semibold shadow-md backdrop-blur hover:bg-white"
-          >
-            <span aria-hidden="true">🗺️</span>
-            {t("map.open")}
-            {!isTouch && <kbd className="bg-ink/10 rounded px-1.5 text-xs font-bold">M</kbd>}
-          </button>
+          />
+          <HudButton
+            testId="open-album"
+            icon="📔"
+            label={t("album.open")}
+            hotkey={isTouch ? undefined : "B"}
+            badge={unlockedCount > 0 ? String(unlockedCount) : undefined}
+            onClick={() => useWorld.getState().setPanel("album")}
+          />
+          <HudButton
+            testId="toggle-sound"
+            icon={muted ? "🔇" : "🔊"}
+            label={t(muted ? "settings.unmute" : "settings.mute")}
+            compact
+            onClick={() => useSettings.getState().setMuted(!muted)}
+          />
+          <HudButton
+            testId="open-settings"
+            icon="⚙️"
+            label={t("settings.open")}
+            compact
+            onClick={() => useWorld.getState().setPanel("settings")}
+          />
         </div>
       )}
 

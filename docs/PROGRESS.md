@@ -2,6 +2,15 @@
 
 Newest entry first.
 
+## M6: Atmosphere and experiences (done)
+
+- Procedural ambient sound per place with the Web Audio API (no audio files): wind, leaves and birds in the park; murmur, cups and the S-Bahn overhead at the café; traffic hum and passing cars on the boulevard. Quiet by default, starts on the first user gesture, mute button in the HUD. The musician's song is a short plucked melody.
+- Background pedestrians: instanced walkers strolling along footpaths that the pipeline extracts from OSM (five draw calls for the whole crowd, count depends on quality).
+- Berlin album (key `B`): all 12 experiences grouped by place, with progress.
+- Settings panel: language, sound, graphics quality (auto, low, medium, high), controls, links.
+- Emotion and action bubbles above NPCs and quality levels were already done in M3 and M2.
+- Sound was not auditioned by ear in the headless development environment: it is implemented and wired, but its mix should be checked on a real device.
+
 ## M5: Supabase (done, waiting for keys to go live)
 
 - Migration `supabase/migrations/20261114000000_init.sql`: `profiles`, `experiences`, `npc_memories`, `rate_limits`, `global_usage`, RLS on all of them, policies scoped to `auth.uid()`, and the atomic `consume_chat_quota` function (service role only).

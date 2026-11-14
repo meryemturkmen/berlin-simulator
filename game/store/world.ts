@@ -11,6 +11,9 @@ interface WorldState {
   factIndex: number;
   mapOpen: boolean;
   setMapOpen: (open: boolean) => void;
+  /** Which secondary panel is open, if any. */
+  panel: "album" | "settings" | null;
+  setPanel: (panel: "album" | "settings" | null) => void;
   travelTo: (placeId: string) => void;
   markReady: () => void;
 }
@@ -37,7 +40,11 @@ export const useWorld = create<WorldState>((set, get) => ({
   factIndex: 0,
   mapOpen: false,
   setMapOpen(mapOpen) {
-    set({ mapOpen });
+    set({ mapOpen, panel: null });
+  },
+  panel: null,
+  setPanel(panel) {
+    set({ panel, mapOpen: false });
   },
   travelTo(placeId) {
     if (placeId === get().placeId) {

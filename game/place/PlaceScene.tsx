@@ -17,6 +17,7 @@ import type { Place } from "@/lib/places/schema";
 import { terrainHeight } from "@/lib/places/terrain";
 import { getNpc } from "@/content/npcs";
 import { Npc } from "@/game/npc/Npc";
+import { Pedestrians } from "@/game/npc/Pedestrians";
 import { createPlaceMaterials } from "./materials";
 import { Props, Shops } from "./Props";
 import { Benches, Lamps, Trees } from "./Scenery";
@@ -46,6 +47,8 @@ interface PlaceSceneProps {
   shadows: boolean;
   /** Fraction of scenery trees to draw (trees with colliders are always kept). */
   treeDensity: number;
+  /** Number of background pedestrians. */
+  crowd: number;
   onReady: () => void;
 }
 
@@ -54,7 +57,13 @@ interface PlaceSceneProps {
  * runtime materials, instanced trees, benches and lamps, static colliders,
  * invisible walls around the walkable square, and seat interactions.
  */
-export default function PlaceScene({ place, shadows, treeDensity, onReady }: PlaceSceneProps) {
+export default function PlaceScene({
+  place,
+  shadows,
+  treeDensity,
+  crowd,
+  onReady,
+}: PlaceSceneProps) {
   const { manifest, scene } = usePlaceAssets(place.id);
   const heightAt = useCallback(
     (x: number, z: number) => terrainHeight(place.terrain, x, z),
@@ -200,6 +209,12 @@ export default function PlaceScene({ place, shadows, treeDensity, onReady }: Pla
       <Benches benches={allBenches} heightAt={heightAt} />
       <Lamps lamps={manifest.lamps} heightAt={heightAt} />
       <Props props={place.props} heightAt={heightAt} />
+      <Pedestrians
+        walkways={manifest.walkways}
+        count={crowd}
+        heightAt={heightAt}
+        seed={place.id.length * 7919}
+      />
       <Shops shops={place.shops} placements={manifest.shops} />
       {place.npcs.map((spot) => {
         const npc = getNpc(spot.npc);

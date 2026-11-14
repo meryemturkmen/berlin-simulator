@@ -9,10 +9,12 @@ import * as THREE from "three";
 import { ChatOverlay } from "@/components/chat/ChatOverlay";
 import { ExperienceToast } from "@/components/hud/ExperienceToast";
 import { Hud } from "@/components/hud/Hud";
+import { Panels } from "@/components/hud/Panels";
 import { MapOverlay } from "@/components/map/MapOverlay";
 import { LoadingScreen } from "@/components/hud/LoadingScreen";
 import { getPlace, PLACES } from "@/content/places";
 import { terrainHeight } from "@/lib/places/terrain";
+import { useAmbient } from "./audio/useAmbient";
 import { useKeyboardInput } from "./input";
 import { Player } from "./player/Player";
 import { installDebugProbe, setDebugPlace, setDebugQuality } from "./runtime";
@@ -38,6 +40,7 @@ export default function Game() {
   const markReady = useWorld((state) => state.markReady);
   const place = getPlace(placeId) ?? PLACES[0];
 
+  useAmbient(place, phase === "playing");
   useKeyboardInput();
   useLookControls(root);
 
@@ -104,6 +107,7 @@ export default function Game() {
                 place={place}
                 shadows={quality.shadowMapSize > 0}
                 treeDensity={quality.treeDensity}
+                crowd={quality.crowd}
                 onReady={onReady}
               />
               <Player look={avatar} spawn={spawn} heightAt={heightAt} />
@@ -118,6 +122,7 @@ export default function Game() {
           <ExperienceToast place={place} />
           <ChatOverlay />
           <MapOverlay />
+          <Panels qualityLevel={quality.level} />
         </>
       )}
       <LoadingScreen place={place} factIndex={factIndex} visible={phase === "loading"} />

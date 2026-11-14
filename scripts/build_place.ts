@@ -177,6 +177,7 @@ function alongPolyline(
 
 interface Scene {
   meshes: MeshBuilder[];
+  walkways: PlaceManifest["walkways"];
   trees: PlaceManifest["trees"];
   benches: PlaceManifest["benches"];
   lamps: PlaceManifest["lamps"];
@@ -283,6 +284,35 @@ function buildEnvironment(place: Place, osm: OsmData, buildings: Building[]): Sc
   const pathLines: Line[] = [];
   const markingColor = hexToLinear("#f1ece0");
   const railColor = hexToLinear("#5b5a63");
+
+  // Routes for background pedestrians: footpaths and sidewalks inside the walkable area.
+  const footLines: Vec2[][] = [];
+  const strollable = place.halfSize - 6;
+  for (const way of osm.ways) {
+    const type = way.tags.highway;
+    if (!type || way.tags.area === "yes" || (way.tags.tunnel && way.tags.tunnel !== "no")) continue;
+    if (!["footway", "path", "pedestrian"].includes(type) || way.tags.footway === "crossing")
+      continue;
+    // Keep the longest stretch that stays inside the walkable square.
+    let run: Vec2[] = [];
+    const flush = () => {
+      if (run.length >= 2) footLines.push(run);
+      run = [];
+    };
+    for (const point of way.points) {
+      if (Math.abs(point[0]) < strollable && Math.abs(point[1]) < strollable) run.push(point);
+      else flush();
+    }
+    flush();
+  }
+  const lineLength = (line: Vec2[]) =>
+    line
+      .slice(1)
+      .reduce(
+        (sum, point, index) =>
+          sum + Math.hypot(point[0] - line[index][0], point[1] - line[index][1]),
+        0,
+      );
 
   const drawLine = (way: OsmWay) => {
     const tags = way.tags;
@@ -518,8 +548,17 @@ function buildEnvironment(place: Place, osm: OsmData, buildings: Building[]): Sc
     "env",
     `${place.id}: ${trees.length} trees (${mapped} mapped), ${benches.length} benches, ${lamps.length} lamps`,
   );
+  const walkways = footLines
+    .filter((line) => lineLength(line) >= 45)
+    // Not through buildings (arcades, station halls) or across reserved spots.
+    .filter((line) => !line.some(([x, z]) => inBuilding(x, z, -1.5) || nearReserved(x, z, 2.5)))
+    .sort((a, b) => lineLength(b) - lineLength(a))
+    .slice(0, 6)
+    .map((line) => line.map(([x, z]): [number, number] => [round(x), round(z)]));
+
   return {
     meshes: [ground, green, water, paths, curbs, roads, markings],
+    walkways,
     trees,
     benches,
     lamps,
@@ -638,6 +677,7 @@ export async function buildPlace(place: Place, forceOsmBuildings = false): Promi
     benches: scene.benches,
     lamps: scene.lamps,
     shops: snapShops(place, buildings),
+    walkways: scene.walkways,
     stats: { buildings: buildings.length, triangles, glbBytes, buildingSource: source },
   };
   writeFileSync(join(directory, `${place.id}.json`), JSON.stringify(manifest));

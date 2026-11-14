@@ -70,11 +70,11 @@ Checked items are done and verified. See `docs/PROGRESS.md` for the log and `doc
 
 ## M6: Atmosphere and experiences
 
-- [ ] Procedural ambient sound per place, quiet by default, mute button
-- [ ] Instanced background pedestrians on simple paths
-- [ ] Berlin album UI with 3 to 5 experiences per place
-- [ ] Emotion emoji above NPCs
-- [ ] Quality levels: auto-detect plus manual setting
+- [x] Procedural ambient sound per place, quiet by default, mute button
+- [x] Instanced background pedestrians on simple paths
+- [x] Berlin album UI with 3 to 5 experiences per place
+- [x] Emotion emoji above NPCs
+- [x] Quality levels: auto-detect plus manual setting
 
 ## M7: Portfolio polish
 

@@ -85,3 +85,11 @@ Every write also goes to localStorage and reads fall back to it. A paused free-t
 ## D21: Inventory lives on the profile row
 
 The brief lists four tables as a minimum. The carried drink is one small JSON array, so it is a column on `profiles` rather than a fifth table. `global_usage` (one row per day) holds the global daily counter.
+
+## D22: Procedural audio only
+
+All sound is synthesized at runtime with the Web Audio API: looped filtered noise for the ambience bed, short oscillator events for birds, cups and cars, triangle-wave plucks for the song. No audio assets, no licenses to track, nothing to download.
+
+## D23: Pedestrian routes from map data
+
+Background walkers follow footpath polylines that the pipeline selects from OSM (long enough, inside the walkable area, not through buildings or reserved spots). They are decoration: no collision, no dialogue.

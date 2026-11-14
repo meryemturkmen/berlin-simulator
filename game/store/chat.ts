@@ -10,6 +10,7 @@ import {
   type NpcMemory,
 } from "@/lib/npc/schema";
 import { getRepository } from "@/lib/storage/repository";
+import { accessToken } from "@/lib/supabase/client";
 import { runtime } from "@/game/runtime";
 import { useAlbum } from "./album";
 import { useNpcs } from "./npcs";
@@ -65,7 +66,7 @@ export const useChat = create<ChatState>((set, get) => ({
     usePlayer.getState().setFrozen(true);
     const spot = getPlace(npc.location)?.npcs.find((candidate) => candidate.npc === npc.id);
     runtime.focus = spot ? { x: spot.x, z: spot.z } : null;
-    memory = await getRepository().loadMemory(npc.id);
+    memory = await (await getRepository()).loadMemory(npc.id);
     const language = useSettings.getState().language;
     const playerName = useProfile.getState().avatar?.name ?? "";
     const greeting =
@@ -113,6 +114,8 @@ export const useChat = create<ChatState>((set, get) => ({
 
     abort = new AbortController();
     let streamed = "";
+    // Signed-in players are rate limited and remembered by account.
+    const token = await accessToken();
     await streamChat(
       {
         npcId: npc.id,
@@ -136,7 +139,7 @@ export const useChat = create<ChatState>((set, get) => ({
             break;
           case "memory":
             memory = event.memory;
-            void getRepository().saveMemory(npc.id, event.memory);
+            void getRepository().then((repository) => repository.saveMemory(npc.id, event.memory));
             break;
           case "error":
             if (event.code === "bad_request")
@@ -145,7 +148,7 @@ export const useChat = create<ChatState>((set, get) => ({
             break;
         }
       },
-      { signal: abort.signal },
+      { signal: abort.signal, headers: token ? { Authorization: `Bearer ${token}` } : undefined },
     );
     if (get().npc?.id === npc.id) {
       useNpcs.getState().patch(npc.id, { talking: false });

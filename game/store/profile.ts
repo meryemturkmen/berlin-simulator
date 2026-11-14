@@ -15,11 +15,11 @@ export const useProfile = create<ProfileState>((set, get) => ({
   avatar: null,
   async hydrate() {
     if (get().status === "ready") return;
-    const avatar = await getRepository().loadAvatar();
+    const avatar = await (await getRepository()).loadAvatar();
     set({ avatar, status: "ready" });
   },
   async saveAvatar(avatar) {
     set({ avatar, status: "ready" });
-    await getRepository().saveAvatar(avatar);
+    await (await getRepository()).saveAvatar(avatar);
   },
 }));

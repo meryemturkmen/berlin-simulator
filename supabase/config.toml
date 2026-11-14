@@ -1,0 +1,5 @@
+# Minimal Supabase CLI configuration. Used by `supabase link` and `supabase db push`.
+project_id = "berlin-simulator"
+
+[auth]
+enable_anonymous_sign_ins = true

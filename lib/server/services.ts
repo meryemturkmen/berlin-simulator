@@ -1,9 +1,15 @@
 import type { NpcMemory } from "@/lib/npc/schema";
 import type { LanguageModel } from "@/lib/npc/turn";
-import { readServerConfig } from "./config";
+import { readServerConfig, type ServerConfig } from "./config";
 import { anonymousKey } from "./identity";
 import { createQwenModel } from "./qwen";
 import { MemoryRateLimiter, type RateLimiter } from "./rateLimit";
+import {
+  createAdminClient,
+  createIdentify,
+  createMemoryStore,
+  SupabaseRateLimiter,
+} from "./supabase";
 
 export interface ChatUser {
   /** Stable key for rate limiting. */
@@ -36,17 +42,31 @@ const clientHeldMemory: MemoryStore = {
 
 let services: ChatServices | null = null;
 
+/** Builds the chat route's dependencies from configuration. Exported for tests. */
+export function createChatServices(config: ServerConfig): ChatServices {
+  const model = config.qwen ? createQwenModel(config.qwen) : null;
+  const memoryLimiter = new MemoryRateLimiter(config.rateLimit);
+  if (!config.supabase) {
+    return {
+      model,
+      rateLimiter: memoryLimiter,
+      memory: clientHeldMemory,
+      async identify(request) {
+        return { key: anonymousKey(request), userId: null };
+      },
+    };
+  }
+  const admin = createAdminClient(config.supabase);
+  return {
+    model,
+    rateLimiter: new SupabaseRateLimiter(admin, config.rateLimit, memoryLimiter),
+    memory: createMemoryStore(admin),
+    identify: createIdentify(admin),
+  };
+}
+
 /** Wires up the chat route from environment configuration, once per server instance. */
 export function getChatServices(): ChatServices {
-  if (services) return services;
-  const config = readServerConfig();
-  services = {
-    model: config.qwen ? createQwenModel(config.qwen) : null,
-    rateLimiter: new MemoryRateLimiter(config.rateLimit),
-    memory: clientHeldMemory,
-    async identify(request) {
-      return { key: anonymousKey(request), userId: null };
-    },
-  };
+  services ??= createChatServices(readServerConfig());
   return services;
 }

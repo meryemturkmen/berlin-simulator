@@ -59,6 +59,25 @@ export const localRepository: PlayerRepository = {
   },
 };
 
-export function getRepository(): PlayerRepository {
-  return localRepository;
+let repository: Promise<PlayerRepository> | null = null;
+
+/**
+ * The repository for this session: Supabase when it is configured and an
+ * anonymous session could be opened, otherwise local storage. Decided once.
+ */
+export function getRepository(): Promise<PlayerRepository> {
+  repository ??= (async () => {
+    if (!isSupabaseConfigured()) return localRepository;
+    const { getSupabase, ensureSession } = await import("@/lib/supabase/client");
+    const supabase = getSupabase();
+    const session = await ensureSession(supabase);
+    if (!supabase || !session) return localRepository;
+    const { createSupabaseRepository } = await import("@/lib/supabase/repository");
+    return createSupabaseRepository(supabase, session.userId, localRepository);
+  })();
+  return repository;
+}
+
+function isSupabaseConfigured(): boolean {
+  return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 }

@@ -73,3 +73,15 @@ LoD2 buildings carry an ALKIS function code. Churches, memorials, station buildi
 ## D18: Shops are set dressing on real walls
 
 Shop fronts (sign, windows, door, awning) with invented names are placed roughly in the place definition and snapped onto the nearest LoD2 wall by the pipeline. No real shop or brand is represented.
+
+## D19: Supabase access pattern
+
+The browser uses the anon key with an anonymous session and talks to Postgres directly for its own profile, album and inventory; RLS policies restrict every statement to `auth.uid()`. NPC memory and rate limits are only written by the chat route with the service role key. Rate limiting is one `security definer` function that locks the two counter rows, so parallel requests cannot overshoot, and it is not executable by `anon` or `authenticated`.
+
+## D20: Local mirror
+
+Every write also goes to localStorage and reads fall back to it. A paused free-tier project, a blocked third-party request or a flaky connection therefore never costs the player their progress. Experiences unlocked offline are pushed to the database on the next load.
+
+## D21: Inventory lives on the profile row
+
+The brief lists four tables as a minimum. The carried drink is one small JSON array, so it is a column on `profiles` rather than a fifth table. `global_usage` (one row per day) holds the global daily counter.

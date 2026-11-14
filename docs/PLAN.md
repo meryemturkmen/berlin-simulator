@@ -61,12 +61,12 @@ Checked items are done and verified. See `docs/PROGRESS.md` for the log and `doc
 
 ## M5: Supabase
 
-- [ ] Migrations: `profiles`, `npc_memories`, `experiences`, `rate_limits`, RLS, rate-limit function
-- [ ] Anonymous sign-in on the client
-- [ ] Storage layer: Supabase when configured, else localStorage
-- [ ] Server: verify user token, service role only in route handlers
-- [ ] Rate limit and memory backed by Supabase
-- [ ] Acceptance: data-access tests; `docs/SETUP.md` has exact steps
+- [x] Migrations: `profiles`, `npc_memories`, `experiences`, `rate_limits`, RLS, rate-limit function
+- [x] Anonymous sign-in on the client
+- [x] Storage layer: Supabase when configured, else localStorage
+- [x] Server: verify user token, service role only in route handlers
+- [x] Rate limit and memory backed by Supabase
+- [x] Acceptance: data-access tests; `docs/SETUP.md` has exact steps
 
 ## M6: Atmosphere and experiences
 

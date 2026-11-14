@@ -33,7 +33,7 @@ export const useAlbum = create<AlbumState>((set, get) => ({
   toast: null,
   async hydrate() {
     if (get().hydrated) return;
-    const repository = getRepository();
+    const repository = await getRepository();
     const [unlocked, inventory] = await Promise.all([
       repository.loadExperiences(),
       repository.loadInventory(),
@@ -49,13 +49,13 @@ export const useAlbum = create<AlbumState>((set, get) => ({
     const experience = getExperience(id);
     if (!experience || get().unlocked.includes(id)) return;
     set((state) => ({ unlocked: [...state.unlocked, id], toast: experience }));
-    void getRepository().unlockExperience(id);
+    void getRepository().then((repository) => repository.unlockExperience(id));
   },
   addItem(item) {
     // One of each is enough: a second matcha replaces the first.
     const inventory = [...get().inventory.filter((owned) => owned !== item), item];
     set({ inventory });
-    void getRepository().saveInventory(inventory);
+    void getRepository().then((repository) => repository.saveInventory(inventory));
   },
   dismissToast() {
     set({ toast: null });

@@ -2,6 +2,16 @@
 
 Newest entry first.
 
+## M5: Supabase (done, waiting for keys to go live)
+
+- Migration `supabase/migrations/20261114000000_init.sql`: `profiles`, `experiences`, `npc_memories`, `rate_limits`, `global_usage`, RLS on all of them, policies scoped to `auth.uid()`, and the atomic `consume_chat_quota` function (service role only).
+- Browser: anonymous sign-in on first use; a Supabase repository that mirrors every write to localStorage and falls back to it on errors, so the game also works offline or with a paused project.
+- Server: bearer token verification, rate limiting through the database function (shared bucket for callers without an account, in-memory fallback during outages), NPC memory stored with the service role.
+- No keys configured means localStorage and in-memory limits, automatically.
+- Data access is tested against a fake Supabase HTTP API (19 tests); the migration is checked for RLS on every table.
+- `docs/SETUP.md` has the click paths for Supabase, Qwen and Vercel.
+- Not verified against a live project yet: that needs the keys.
+
 ## M4: Map, teleport, Mitte and Ku'damm (done)
 
 - `scripts/build_map.ts`: district boundaries from the Geoportal Berlin WFS, simplified to 11 kB of SVG paths, with place markers.

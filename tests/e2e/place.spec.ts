@@ -61,7 +61,7 @@ test("the map travels to every place", async ({ page }) => {
     await expect(map).toBeVisible();
     await map.getByTestId(`map-place-${id}`).click();
     // Loading screen with a fact about the destination, then the new scene.
-    await expect(page.getByTestId("loading-screen")).toHaveCSS("opacity", "1");
+    await expect(page.getByTestId("loading-screen")).toHaveAttribute("aria-hidden", "false");
     await expect(page.getByTestId("loading-screen")).toContainText(name);
     await expect.poll(async () => (await snapshot(page)).place, { timeout: 60_000 }).toBe(id);
     await expect(page.getByTestId("place-name")).toHaveText(name, { timeout: 60_000 });

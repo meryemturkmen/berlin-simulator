@@ -90,7 +90,7 @@ export default function Game() {
         <Canvas
           key={quality.level}
           shadows={quality.shadowMapSize > 0}
-          flat
+          gl={{ toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.0 }}
           camera={{ position: [0, 3, 8], fov: 55, near: 0.3, far: 700 }}
           dpr={[1, quality.maxPixelRatio]}
         >

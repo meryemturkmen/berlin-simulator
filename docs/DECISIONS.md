@@ -93,3 +93,14 @@ All sound is synthesized at runtime with the Web Audio API: looped filtered nois
 ## D23: Pedestrian routes from map data
 
 Background walkers follow footpath polylines that the pipeline selects from OSM (long enough, inside the walkable area, not through buildings or reserved spots). They are decoration: no collision, no dialogue.
+
+## D24: Realism pass (supersedes D10)
+
+On request the look moved from pastel toy town toward a more realistic city, still without any hand-made or photographed assets:
+
+- ACES filmic tone mapping with a strong warm key light and a cool sky fill replaces the untone-mapped pastel setup of D10.
+- Muted plaster and roof colors. The facade shader now draws plaster stains, a stone plinth, shop-height ground floors, cornices, stucco bands, and windows with frames, glazing bars, sills, reveal shadows, curtains and sky reflections; roofs get tile courses, plain masonry gets stone courses.
+- Ground shaders: granite slabs with joints, asphalt grain and wear, gravel, uneven lawn. Detail fades with pixel footprint so nothing shimmers.
+- Trees: branching trunks and smooth, lumpy foliage clumps with a 3D leaf-noise shader instead of faceted blobs.
+- Sky: horizon haze and procedural drifting clouds in the dome shader instead of low-poly cloud meshes.
+- Characters: adult proportions (smaller head, longer limbs, shoulders, nose) for player, NPCs and pedestrians.

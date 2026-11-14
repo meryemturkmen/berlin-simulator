@@ -19,17 +19,27 @@
   "halfSize": 150,
   "backdrop": 70,
   "palette": {
-    "ground": "#ddd0b4",
-    "grass": ["#8fbf6a", "#9cc873", "#84b562"],
-    "path": "#e6d3a8",
-    "plaza": "#e2d2ad",
-    "road": "#8d8b93",
-    "curb": "#c9c2b6",
-    "water": "#6fb7d6",
-    "walls": ["#f2c9a5", "#f6dfb4", "#e9b8a0", "#d7e0c0", "#f3e6cf", "#e3c7d6", "#c9dbe6"],
-    "roofs": ["#b5634a", "#9c5a4b", "#7d6b70", "#8a8f99"],
-    "foliage": ["#5f9a4e", "#74ad55", "#4f8a4a", "#88b85c"],
-    "trunk": "#7a5a43"
+    "ground": "#b9b2a4",
+    "grass": ["#587c3e", "#628643", "#4c7036"],
+    "path": "#c9b78f",
+    "plaza": "#c4b598",
+    "road": "#5f5e63",
+    "curb": "#aaa59b",
+    "water": "#4f7f96",
+    "walls": [
+      "#e6dfd0",
+      "#ddd0b4",
+      "#d2c3a6",
+      "#cdc7bc",
+      "#dccb9c",
+      "#d3b98d",
+      "#d4b9a9",
+      "#c3c9bb",
+      "#e9e4da"
+    ],
+    "roofs": ["#8a4b3b", "#75453a", "#5c5d63", "#4c4f56", "#6b5a55"],
+    "foliage": ["#567f3d", "#628a44", "#4b7238", "#6d9349"],
+    "trunk": "#5c4636"
   },
   "terrain": [
     {

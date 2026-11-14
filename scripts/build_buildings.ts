@@ -118,13 +118,13 @@ export async function loadBuildings(
  */
 const FUNCTION_STYLES: { pattern: RegExp; wall: string; roof: string; windows: boolean }[] = [
   // Cultural buildings and memorials (e.g. the Memorial Church ruin): weathered stone.
-  { pattern: /^31001_303\d$/, wall: "#a3968a", roof: "#6f6a68", windows: false },
+  { pattern: /^31001_303\d$/, wall: "#8f8479", roof: "#5d5957", windows: false },
   // Churches and chapels: cool blue-gray, like the glass blocks of the new Memorial Church.
-  { pattern: /^31001_304\d$/, wall: "#8296b3", roof: "#5f6f88", windows: false },
+  { pattern: /^31001_304\d$/, wall: "#6f7f96", roof: "#55617a", windows: false },
   // Railway station buildings: red brick.
-  { pattern: /^31001_309\d$/, wall: "#b9654a", roof: "#6f6a68", windows: true },
+  { pattern: /^31001_309\d$/, wall: "#a5573f", roof: "#5d5957", windows: true },
   // Canopies and bridges: plain concrete.
-  { pattern: /^(51009_1610|53001_\d+)$/, wall: "#cfc8bc", roof: "#b9b2a6", windows: false },
+  { pattern: /^(51009_1610|53001_\d+)$/, wall: "#b9b3a8", roof: "#9e988d", windows: false },
 ];
 
 /**

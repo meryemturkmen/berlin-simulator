@@ -3,8 +3,9 @@
 import { useFrame } from "@react-three/fiber";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
-import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
+import { mergeGeometries, mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
 import { daylight } from "@/game/sky/daylight";
+import { seededRandom } from "@/lib/random";
 import type { Palette, PlaceManifest } from "@/lib/places/schema";
 
 type HeightAt = (x: number, z: number) => number;
@@ -39,39 +40,109 @@ export function Trees({
   const crowns = useRef<THREE.InstancedMesh>(null);
 
   const { trunkGeometry, crownGeometry, trunkMaterial, crownMaterial } = useMemo(() => {
-    const trunkGeometry = new THREE.CylinderGeometry(0.16, 0.26, 3, 6).translate(0, 1.5, 0);
-    // A crown is three overlapping faceted blobs.
-    const blob = (radius: number, x: number, y: number, z: number) =>
-      new THREE.IcosahedronGeometry(radius, 1).scale(1, 0.82, 1).translate(x, y, z);
-    const crownGeometry = mergeGeometries([
-      blob(2.1, 0, 4.4, 0),
-      blob(1.5, 1.2, 3.7, 0.5),
-      blob(1.4, -1.0, 3.9, -0.7),
+    // Trunk with two main branches reaching into the crown.
+    const limb = (radiusTop: number, radiusBottom: number, length: number) =>
+      new THREE.CylinderGeometry(radiusTop, radiusBottom, length, 7).translate(0, length / 2, 0);
+    const trunkGeometry = mergeGeometries([
+      limb(0.15, 0.27, 3.4),
+      limb(0.07, 0.14, 2.2).rotateZ(0.55).translate(0, 2.7, 0),
+      limb(0.07, 0.13, 2.0).rotateZ(-0.5).rotateY(1.9).translate(0, 2.9, 0),
     ])!;
-    const crownMaterial = new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.95 });
-    // Gentle wind: sway each crown around its base, phase-shifted per tree.
+
+    // Crown: irregular clumps of foliage around the branches. Each clump keeps
+    // its own smooth normals, which reads as separate masses of leaves.
+    const random = seededRandom(11);
+    const clump = (radius: number, x: number, y: number, z: number) => {
+      // Welded, so normals are averaged across faces and the clump shades smoothly.
+      const geometry = mergeVertices(
+        new THREE.IcosahedronGeometry(radius, 2).deleteAttribute("uv").deleteAttribute("normal"),
+      );
+      const positions = geometry.getAttribute("position");
+      const vertex = new THREE.Vector3();
+      for (let index = 0; index < positions.count; index++) {
+        vertex.fromBufferAttribute(positions, index);
+        // Lumpy rather than spherical; hashing by direction keeps seams closed.
+        const bump =
+          Math.sin(vertex.x * 3.1 + x) *
+          Math.sin(vertex.y * 2.7 + y) *
+          Math.sin(vertex.z * 3.3 + z);
+        vertex.multiplyScalar(1 + bump * 0.16);
+        positions.setXYZ(index, vertex.x, vertex.y * 0.82, vertex.z);
+      }
+      geometry.computeVertexNormals();
+      return geometry.translate(x, y, z);
+    };
+    const clumps = [clump(1.9, 0, 4.9, 0)];
+    for (let index = 0; index < 6; index++) {
+      const angle = (index / 6) * Math.PI * 2 + random() * 0.6;
+      const reach = 1.25 + random() * 0.55;
+      clumps.push(
+        clump(
+          1.15 + random() * 0.45,
+          Math.cos(angle) * reach,
+          3.7 + random() * 1.5,
+          Math.sin(angle) * reach,
+        ),
+      );
+    }
+    const crownGeometry = mergeGeometries(clumps)!;
+
+    const crownMaterial = new THREE.MeshStandardMaterial({ roughness: 0.95 });
     crownMaterial.onBeforeCompile = (shader) => {
       shader.uniforms.uTime = daylight.uniforms.uTime;
       shader.vertexShader = shader.vertexShader
-        .replace("#include <common>", "#include <common>\nuniform float uTime;")
+        .replace(
+          "#include <common>",
+          "#include <common>\nuniform float uTime;\nvarying vec3 vLeaf;",
+        )
         .replace(
           "#include <begin_vertex>",
           /* glsl */ `#include <begin_vertex>
+          vLeaf = position;
           #ifdef USE_INSTANCING
+            // Gentle wind: sway around the base, phase-shifted per tree.
             float phase = instanceMatrix[3].x * 0.35 + instanceMatrix[3].z * 0.27;
-            float sway = sin(uTime * 1.1 + phase) * 0.035 + sin(uTime * 2.3 + phase * 1.7) * 0.015;
+            float sway = sin(uTime * 1.1 + phase) * 0.03 + sin(uTime * 2.3 + phase * 1.7) * 0.012;
             transformed.x += sway * transformed.y;
             transformed.z += sway * 0.6 * transformed.y;
+            vLeaf += instanceMatrix[3].xyz;
           #endif`,
         );
+      shader.fragmentShader = shader.fragmentShader
+        .replace(
+          "#include <common>",
+          /* glsl */ `#include <common>
+          varying vec3 vLeaf;
+          float leafHash(vec3 p) {
+            p = fract(p * 0.3183099 + 0.1);
+            p *= 17.0;
+            return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
+          }
+          float leafNoise(vec3 p) {
+            vec3 i = floor(p);
+            vec3 f = fract(p);
+            f = f * f * (3.0 - 2.0 * f);
+            return mix(
+              mix(mix(leafHash(i), leafHash(i + vec3(1, 0, 0)), f.x), mix(leafHash(i + vec3(0, 1, 0)), leafHash(i + vec3(1, 1, 0)), f.x), f.y),
+              mix(mix(leafHash(i + vec3(0, 0, 1)), leafHash(i + vec3(1, 0, 1)), f.x), mix(leafHash(i + vec3(0, 1, 1)), leafHash(i + vec3(1, 1, 1)), f.x), f.y),
+              f.z
+            );
+          }`,
+        )
+        .replace(
+          "#include <color_fragment>",
+          /* glsl */ `#include <color_fragment>
+          // Leaf texture: clusters of lighter and darker foliage, darker inside and below.
+          float leaves = leafNoise(vLeaf * 1.9) * 0.55 + leafNoise(vLeaf * 6.0) * 0.45;
+          diffuseColor.rgb *= 0.55 + 1.1 * leaves;
+          diffuseColor.rgb *= mix(0.68, 1.12, smoothstep(2.6, 6.2, vLeaf.y - floor(vLeaf.y / 1000.0) * 1000.0));
+          diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(1.15, 1.1, 0.7), smoothstep(0.7, 0.95, leaves) * 0.5);`,
+        );
     };
-    crownMaterial.customProgramCacheKey = () => "berlin-crown";
-    return {
-      trunkGeometry,
-      crownGeometry,
-      trunkMaterial: new THREE.MeshStandardMaterial({ color: palette.trunk, roughness: 1 }),
-      crownMaterial,
-    };
+    crownMaterial.customProgramCacheKey = () => "berlin-crown-v2";
+
+    const trunkMaterial = new THREE.MeshStandardMaterial({ color: palette.trunk, roughness: 1 });
+    return { trunkGeometry, crownGeometry, trunkMaterial, crownMaterial };
   }, [palette.trunk]);
 
   useLayoutEffect(() => {

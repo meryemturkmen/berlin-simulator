@@ -82,13 +82,13 @@ export function Pedestrians({ walkways, count, heightAt, seed }: PedestriansProp
 
   const assets = useMemo(
     () => ({
-      torso: new THREE.CapsuleGeometry(0.17, 0.3, 3, 8).translate(0, 1.08, 0),
-      head: new THREE.SphereGeometry(0.2, 10, 8).translate(0, 1.56, 0),
-      hair: new THREE.SphereGeometry(0.215, 10, 6, 0, Math.PI * 2, 0, Math.PI * 0.55)
+      torso: new THREE.CapsuleGeometry(0.16, 0.36, 3, 8).scale(1.05, 1, 0.7).translate(0, 1.2, 0),
+      head: new THREE.SphereGeometry(0.13, 10, 8).translate(0, 1.66, 0),
+      hair: new THREE.SphereGeometry(0.14, 10, 6, 0, Math.PI * 2, 0, Math.PI * 0.55)
         .rotateX(-0.3)
-        .translate(0, 1.57, 0),
+        .translate(0, 1.67, 0),
       // Legs hang from the hip so rotating them swings the foot.
-      leg: new THREE.CapsuleGeometry(0.07, 0.6, 3, 6).translate(0, -0.37, 0),
+      leg: new THREE.CapsuleGeometry(0.07, 0.7, 3, 6).translate(0, -0.42, 0),
       material: new THREE.MeshStandardMaterial({ roughness: 0.9 }),
     }),
     [],
@@ -145,7 +145,7 @@ export function Pedestrians({ walkways, count, heightAt, seed }: PedestriansProp
         [legRight.current, -1],
       ] as const) {
         local.makeRotationX(-swing * side);
-        local.setPosition(0.09 * side, 0.8, 0);
+        local.setPosition(0.09 * side, 0.9, 0);
         mesh?.setMatrixAt(index, matrix.multiplyMatrices(base, local));
       }
     });

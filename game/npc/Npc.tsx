@@ -134,7 +134,7 @@ export function Npc({ npc, spot, y }: NpcProps) {
           chestItem={spot.pose === "play_guitar" ? <Guitar /> : undefined}
         />
         <Html
-          position={[0, seated ? 1.45 : 2.2, 0]}
+          position={[0, seated ? 1.4 : 2.05, 0]}
           center
           zIndexRange={[20, 0]}
           distanceFactor={9}

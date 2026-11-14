@@ -39,14 +39,14 @@ const BUILD = {
 } as const;
 
 // Body proportions in meters for the medium build. The figure faces +Z.
-const HIP_Y = 0.8;
-const THIGH = 0.38;
-const SHIN = 0.37;
-const SHOULDER_Y = 1.27;
-const UPPER_ARM = 0.25;
-const FOREARM = 0.23;
-const HEAD_Y = 1.58;
-const HEAD_R = 0.215;
+const HIP_Y = 0.9;
+const THIGH = 0.43;
+const SHIN = 0.41;
+const SHOULDER_Y = 1.44;
+const UPPER_ARM = 0.29;
+const FOREARM = 0.26;
+const HEAD_Y = 1.66;
+const HEAD_R = 0.135;
 export const AVATAR_HEIGHT = 1.82;
 
 const WALK_SPEED_REF = 3.4;
@@ -370,7 +370,7 @@ export function AvatarModel({ look, poseRef, handItem, chestItem }: AvatarModelP
         <Segment length={FOREARM} radius={armRadius * 0.92} material={forearmMaterial} />
         <group position={[0, -FOREARM - 0.02, 0]}>
           <mesh material={materials.skin} castShadow>
-            <sphereGeometry args={[0.052 * limb, 10, 8]} />
+            <sphereGeometry args={[0.046 * limb, 10, 8]} />
           </mesh>
           {item}
         </group>
@@ -400,22 +400,22 @@ export function AvatarModel({ look, poseRef, handItem, chestItem }: AvatarModelP
         )}
 
         <group ref={torso} position={[0, HIP_Y, 0]}>
-          <mesh position={[0, 0.27, 0]} scale={[1, 1, 0.74]} material={materials.top} castShadow>
-            <capsuleGeometry args={[0.178 * w, 0.2, 6, 18]} />
+          <mesh position={[0, 0.3, 0]} scale={[1.06, 1, 0.68]} material={materials.top} castShadow>
+            <capsuleGeometry args={[0.175 * w, 0.27, 6, 18]} />
           </mesh>
           {look.top === "jacket" && (
-            <mesh position={[0, 0.27, 0.12 * w]} material={materials.sole}>
-              <boxGeometry args={[0.09 * w, 0.36, 0.03]} />
+            <mesh position={[0, 0.3, 0.115 * w]} material={materials.sole}>
+              <boxGeometry args={[0.09 * w, 0.44, 0.03]} />
             </mesh>
           )}
           {look.top === "hoodie" && (
             <mesh
-              position={[0, 0.47, -0.05]}
+              position={[0, 0.56, -0.05]}
               rotation={[1.25, 0, 0]}
               material={materials.top}
               castShadow
             >
-              <torusGeometry args={[0.105, 0.05, 8, 14]} />
+              <torusGeometry args={[0.095, 0.045, 8, 14]} />
             </mesh>
           )}
           <group position={[0, 0.3, 0]}>{chestItem}</group>
@@ -432,18 +432,25 @@ export function AvatarModel({ look, poseRef, handItem, chestItem }: AvatarModelP
           <mesh scale={[1, 1.06, 1]} material={materials.skin} castShadow>
             <sphereGeometry args={[HEAD_R, 20, 16]} />
           </mesh>
-          <mesh position={[0.075, 0.015, HEAD_R * 0.93]} material={materials.eye}>
-            <sphereGeometry args={[0.024, 8, 8]} />
+          <mesh position={[0.048, 0.012, HEAD_R * 0.92]} material={materials.eye}>
+            <sphereGeometry args={[0.014, 8, 8]} />
           </mesh>
-          <mesh position={[-0.075, 0.015, HEAD_R * 0.93]} material={materials.eye}>
-            <sphereGeometry args={[0.024, 8, 8]} />
+          <mesh position={[-0.048, 0.012, HEAD_R * 0.92]} material={materials.eye}>
+            <sphereGeometry args={[0.014, 8, 8]} />
           </mesh>
           <mesh
-            position={[0, -0.058, HEAD_R * 0.955]}
+            position={[0, -0.014, HEAD_R * 0.99]}
+            scale={[0.8, 1.1, 1]}
+            material={materials.skin}
+          >
+            <sphereGeometry args={[0.02, 8, 8]} />
+          </mesh>
+          <mesh
+            position={[0, -0.052, HEAD_R * 0.93]}
             rotation={[0.25, 0, Math.PI]}
             material={materials.eye}
           >
-            <torusGeometry args={[0.034, 0.007, 6, 10, Math.PI]} />
+            <torusGeometry args={[0.022, 0.005, 6, 10, Math.PI]} />
           </mesh>
           <Hair style={look.hairStyle} material={materials.hair} />
         </group>

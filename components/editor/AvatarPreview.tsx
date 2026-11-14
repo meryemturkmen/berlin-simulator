@@ -30,7 +30,7 @@ export default function AvatarPreview({
   angleRef: RefObject<number>;
 }) {
   return (
-    <Canvas shadows dpr={[1, 2]} camera={{ position: [0, 1.2, 4.3], fov: 30 }}>
+    <Canvas shadows dpr={[1, 2]} camera={{ position: [0, 1.15, 4.6], fov: 30 }}>
       <hemisphereLight args={["#fff6e8", "#c9b79c", 1.3]} />
       <directionalLight position={[3, 5, 4]} intensity={2.4} castShadow />
       <directionalLight position={[-4, 2, -3]} intensity={0.7} color="#ffd7b0" />

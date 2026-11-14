@@ -2,6 +2,10 @@
 
 Newest entry first.
 
+## Realism pass (done)
+
+Requested after M6: a more realistic look. Filmic tone mapping, muted palettes, detailed procedural facades and ground surfaces, smoother trees, procedural clouds with haze, adult character proportions. Details in DECISIONS D24.
+
 ## M6: Atmosphere and experiences (done)
 
 - Procedural ambient sound per place with the Web Audio API (no audio files): wind, leaves and birds in the park; murmur, cups and the S-Bahn overhead at the café; traffic hum and passing cars on the boulevard. Quiet by default, starts on the first user gesture, mute button in the HUD. The musician's song is a short plucked melody.

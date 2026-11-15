@@ -78,8 +78,8 @@ Checked items are done and verified. See `docs/PROGRESS.md` for the log and `doc
 
 ## M7: Portfolio polish
 
-- [ ] README with hero screenshot, features, architecture diagram, stack, local start, licenses
-- [ ] `/about` page with Mermaid diagram and data sources
-- [ ] `public/assets/LICENSES.md`
-- [ ] Lighthouse check of the start page
-- [ ] Final run of all tests
+- [x] README with hero screenshot, features, architecture diagram, stack, local start, licenses
+- [x] `/about` page with Mermaid diagram and data sources
+- [x] `public/assets/LICENSES.md`
+- [x] Lighthouse check of the start page
+- [x] Final run of all tests

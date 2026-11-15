@@ -245,8 +245,8 @@ function ShopFront({
   return (
     <group position={[placement[0], 0, placement[1]]} rotation={[0, placement[2], 0]}>
       {/* Frame, windows, door */}
-      <mesh position={[0, 1.75, 0]}>
-        <boxGeometry args={[SHOP_WIDTH, 3.5, 0.16]} />
+      <mesh position={[0, 1.75, -0.27]}>
+        <boxGeometry args={[SHOP_WIDTH, 3.5, 0.7]} />
         <meshStandardMaterial color="#f3ead9" roughness={0.9} />
       </mesh>
       {[-2.5, 2.5].map((x) => (

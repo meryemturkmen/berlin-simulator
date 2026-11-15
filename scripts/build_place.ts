@@ -649,7 +649,8 @@ function snapShops(place: Place, buildings: Building[]): PlaceManifest["shops"] 
       log("shops", `${place.id}: no wall found behind "${shop.name}", keeping its position`);
       return [shop.x, shop.z, shop.heading];
     }
-    const out = 0.12;
+    // Far enough out to clear pilasters and other small projections.
+    const out = 0.36;
     return [
       round(origin[0] - normal[0] * best + Math.sin(heading) * out),
       round(origin[1] - normal[1] * best + Math.cos(heading) * out),

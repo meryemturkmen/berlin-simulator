@@ -2,6 +2,15 @@
 
 Newest entry first.
 
+## M7: Portfolio polish (done)
+
+- README with hero screenshot, feature list, architecture diagram, stack, local start and licenses.
+- `/about` in German and English with the Mermaid architecture diagram (library loaded on demand), data sources and repository link.
+- `public/assets/LICENSES.md`.
+- Lighthouse on the title page (production build, local): performance 99, accessibility 100, best practices 100, SEO 100.
+- Final run: 152 unit tests, 22 Playwright scenarios on desktop and mobile, lint, typecheck and build all green.
+- Still open on Mer's side: Supabase project, Qwen key, Vercel import (`docs/SETUP.md`). Until then the deployed app runs in mock mode with localStorage.
+
 ## Realism pass (done)
 
 Requested after M6: a more realistic look. Filmic tone mapping, muted palettes, detailed procedural facades and ground surfaces, smoother trees, procedural clouds with haze, adult character proportions. Details in DECISIONS D24.

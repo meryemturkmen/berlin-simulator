@@ -2,6 +2,11 @@
 
 Newest entry first.
 
+## Photographic ground (done), photo mesh (waiting for the portal)
+
+- `scripts/fetch_ortho.ts` downloads the 2024 true orthophoto per place; ground and roofs now show the real surface (lane markings, bike lanes, worn lawns, real roofs).
+- The photo-textured Berlin 3D mesh (2025) would add real facades, but its download portal is under maintenance. See DECISIONS D26.
+
 ## M7: Portfolio polish (done)
 
 - README with hero screenshot, feature list, architecture diagram, stack, local start and licenses.

@@ -7,6 +7,7 @@
 import { buildMap } from "./build_map";
 import { buildPlace } from "./build_place";
 import { fetchLod2 } from "./fetch_lod2";
+import { fetchOrtho } from "./fetch_ortho";
 import { fetchOsm } from "./fetch_osm";
 import { hasFlag, loadPlaces, log, placeArgs, runMain } from "./lib/io";
 
@@ -24,6 +25,12 @@ runMain(import.meta.url, async () => {
     }
   }
   await fetchOsm(places, force);
+  try {
+    await fetchOrtho(places, force);
+  } catch (error) {
+    // Without aerial imagery the game falls back to the drawn ground layers.
+    log("ortho", `download failed (${(error as Error).message}); places keep their drawn ground`);
+  }
   for (const place of places) await buildPlace(place, osmBuildings);
   await buildMap(force);
   log("assets", `done: ${places.map((place) => place.id).join(", ")}`);

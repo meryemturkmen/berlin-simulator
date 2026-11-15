@@ -39,6 +39,10 @@ const COPY = {
     dataTitle: "Daten und Lizenzen",
     data: [
       ["Gebäude", "Geoportal Berlin, 3D-Gebäudemodelle LoD2, Datenlizenz Deutschland Zero 2.0"],
+      [
+        "Boden und Dächer",
+        "Geoportal Berlin, TrueOrthophotos 2024, Datenlizenz Deutschland Zero 2.0",
+      ],
       ["Bezirksgrenzen", "Geoportal Berlin, ALKIS Bezirke, Datenlizenz Deutschland Zero 2.0"],
       ["Straßen, Wege, Grün, Bäume, Bänke", "© OpenStreetMap-Mitwirkende, ODbL"],
       ["Figuren, Möbel, Klang", "prozedural im Quellcode, keine fremden Assets"],
@@ -65,6 +69,10 @@ const COPY = {
     dataTitle: "Data and licenses",
     data: [
       ["Buildings", "Geoportal Berlin, 3D building models LoD2, Data licence Germany Zero 2.0"],
+      [
+        "Ground and roofs",
+        "Geoportal Berlin, true orthophotos 2024, Data licence Germany Zero 2.0",
+      ],
       ["District boundaries", "Geoportal Berlin, ALKIS districts, Data licence Germany Zero 2.0"],
       ["Streets, paths, green, trees, benches", "© OpenStreetMap contributors, ODbL"],
       ["Characters, furniture, sound", "procedural, defined in source code; no third-party assets"],

@@ -4,7 +4,7 @@ A cozy lifestyle simulator set in present-day Berlin that runs in the browser, o
 
 ![Sitting on a bench in Görlitzer Park at sunset](docs/screenshots/goerli-sunset-desktop.jpg)
 
-**The city is real.** Buildings come from Berlin's official 3D city model, streets and trees from OpenStreetMap. **Nothing is hand-modeled.** One command turns open data into three playable places of under 0.5 MB each.
+**The city is real.** Buildings come from Berlin's official 3D city model, the ground and roofs are real aerial photos from 2024, streets and trees come from OpenStreetMap. **Nothing is hand-modeled.** One command turns open data into three playable places of about 1 MB each.
 
 |                                                                      |                                                                       |                                                                                     |
 | -------------------------------------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
@@ -117,6 +117,7 @@ docs/                brief, plan, progress, decisions, setup, screenshots
 
 ## Data and licenses
 
+- Ground and roofs: Geoportal Berlin, "Digitale farbige TrueOrthophotos 2024", Datenlizenz Deutschland – Zero – Version 2.0.
 - Buildings: Geoportal Berlin, "3D-Gebäudemodelle im Level of Detail 2 (LoD 2)", Datenlizenz Deutschland – Zero – Version 2.0.
 - District boundaries: Geoportal Berlin, "ALKIS Berlin Bezirke", Datenlizenz Deutschland – Zero – Version 2.0.
 - Streets, paths, green, water, trees, benches, lamps: © OpenStreetMap contributors, ODbL.

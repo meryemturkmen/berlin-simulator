@@ -111,6 +111,8 @@ export const manifestSchema = z.object({
   trees: z.array(z.tuple([z.number(), z.number(), z.number(), z.number()])),
   benches: z.array(z.tuple([z.number(), z.number(), z.number()])),
   lamps: z.array(z.tuple([z.number(), z.number()])),
+  /** True when an aerial photo (`<id>-ground.jpg`) is available as ground texture. */
+  aerial: z.boolean().default(false),
   /** Polylines background pedestrians stroll along: lists of [x, z]. */
   walkways: z.array(z.array(z.tuple([z.number(), z.number()])).min(2)).default([]),
   /** Shop fronts snapped onto the nearest building wall: x, z, heading. Same order as the place's shops. */

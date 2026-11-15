@@ -64,26 +64,29 @@ export default function PlaceScene({
   crowd,
   onReady,
 }: PlaceSceneProps) {
-  const { manifest, scene } = usePlaceAssets(place.id);
+  const { manifest, scene, aerial } = usePlaceAssets(place.id);
   const heightAt = useCallback(
     (x: number, z: number) => terrainHeight(place.terrain, x, z),
     [place.terrain],
   );
 
   const { colliders } = useMemo(() => {
-    const { materials, renderOrder } = createPlaceMaterials();
+    const { materials, renderOrder, hidden } = createPlaceMaterials(
+      aerial ? { texture: aerial, extent: manifest.extent } : undefined,
+    );
     const colliders: [Float32Array, Uint32Array][] = [];
     scene.traverse((object) => {
       if (!(object instanceof THREE.Mesh)) return;
       const name = object.name in materials ? object.name : (object.parent?.name ?? "");
       object.material = materials[name] ?? materials.ground;
       object.renderOrder = renderOrder[name] ?? 0;
+      object.visible = !hidden.includes(name);
       object.receiveShadow = true;
       object.castShadow = name === "buildings";
       if (name === "ground" || name === "buildings") colliders.push(trimeshArgs(object));
     });
     return { colliders };
-  }, [scene]);
+  }, [scene, aerial, manifest.extent]);
 
   const half = manifest.halfSize;
   const nearTrees = useMemo(

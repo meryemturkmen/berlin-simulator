@@ -7,12 +7,13 @@
  * green, water, trees, benches and lamps come from OpenStreetMap.
  * Usage: tsx scripts/build_place.ts [placeId...] [--osm-buildings]
  */
-import { readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Place, PlaceManifest } from "../lib/places/schema";
 import { terrainHeight } from "../lib/places/terrain";
 import { seededRandom } from "../lib/random";
 import { buildBuildingMesh, loadBuildings } from "./build_buildings";
+import { orthoAsset } from "./fetch_ortho";
 import { osmFile } from "./fetch_osm";
 import type { Building } from "./lib/citygml";
 import {
@@ -679,6 +680,7 @@ export async function buildPlace(place: Place, forceOsmBuildings = false): Promi
     lamps: scene.lamps,
     shops: snapShops(place, buildings),
     walkways: scene.walkways,
+    aerial: existsSync(orthoAsset(place)),
     stats: { buildings: buildings.length, triangles, glbBytes, buildingSource: source },
   };
   writeFileSync(join(directory, `${place.id}.json`), JSON.stringify(manifest));

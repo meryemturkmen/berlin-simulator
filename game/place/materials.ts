@@ -23,6 +23,27 @@ const NOISE_GLSL = /* glsl */ `
   }
 `;
 
+/** Real aerial photo of the place, mapped top-down over the scenery square. */
+export interface Aerial {
+  texture: THREE.Texture;
+  /** Half the edge length of the square the photo covers, in meters. */
+  extent: number;
+}
+
+const AERIAL_GLSL = /* glsl */ `
+  uniform sampler2D uAerial;
+  uniform float uAerialExtent;
+  // North is -Z and the top of the image.
+  vec3 aerialColor(vec2 xz) {
+    vec2 uv = vec2(xz.x, -xz.y) / (uAerialExtent * 2.0) + 0.5;
+    vec3 photo = texture2D(uAerial, uv).rgb;
+    // Aerial photos are flat and hazy: restore some contrast and color.
+    float luma = dot(photo, vec3(0.299, 0.587, 0.114));
+    photo = mix(vec3(luma), photo, 1.25);
+    return clamp((photo - 0.02) * 1.12, 0.0, 1.0);
+  }
+`;
+
 /**
  * Building material. Geometry carries no textures or normals; everything on
  * the facade is drawn in the fragment shader from the `_wall` attribute the
@@ -35,7 +56,7 @@ const NOISE_GLSL = /* glsl */ `
  * curtains and sky reflections. Roofs get tile courses. At night a random
  * subset of windows is lit.
  */
-export function createBuildingMaterial(): THREE.MeshStandardMaterial {
+export function createBuildingMaterial(aerial?: Aerial): THREE.MeshStandardMaterial {
   const material = new THREE.MeshStandardMaterial({
     vertexColors: true,
     flatShading: true,
@@ -47,6 +68,8 @@ export function createBuildingMaterial(): THREE.MeshStandardMaterial {
     shader.uniforms.uNight = daylight.uniforms.uNight;
     shader.uniforms.uSkyTop = { value: daylight.top };
     shader.uniforms.uSkyHorizon = { value: daylight.horizon };
+    shader.uniforms.uAerial = { value: aerial?.texture ?? null };
+    shader.uniforms.uAerialExtent = { value: aerial?.extent ?? 1 };
     shader.vertexShader = shader.vertexShader
       .replace(
         "#include <common>",
@@ -67,6 +90,7 @@ export function createBuildingMaterial(): THREE.MeshStandardMaterial {
         varying vec4 vWall;
         varying vec3 vWorld;
         ${NOISE_GLSL}
+        ${aerial ? AERIAL_GLSL : ""}
         float band(float value, float from, float to) {
           return step(from, value) * step(value, to);
         }`,
@@ -87,9 +111,11 @@ export function createBuildingMaterial(): THREE.MeshStandardMaterial {
 
           if (wallTop <= 0.0) {
             // Roof: tile courses on pitched roofs, gravel grain on flat ones.
-            float course = fract(h * 3.4);
-            base *= 0.9 + 0.1 * smoothstep(0.0, 0.25, course);
-            base *= 0.86 + 0.26 * fbm(vWorld.xz * 0.9);
+            ${
+              aerial
+                ? "// The real roof, as photographed from the air.\n            base = aerialColor(vWorld.xz) * (0.94 + 0.12 * valueNoise(vWorld.xz * 14.0));"
+                : "float course = fract(h * 3.4);\n            base *= 0.9 + 0.1 * smoothstep(0.0, 0.25, course);\n            base *= 0.86 + 0.26 * fbm(vWorld.xz * 0.9);"
+            }
           } else {
             // Plaster: broad stains, fine grain, rain streaks from the top.
             base *= 0.9 + 0.16 * fbm(surface * vec2(0.35, 0.22));
@@ -194,14 +220,26 @@ export function createBuildingMaterial(): THREE.MeshStandardMaterial {
         totalEmissiveRadiance += litColor * litWindow * 1.6;`,
       );
   };
-  material.customProgramCacheKey = () => "berlin-building-v2";
+  material.customProgramCacheKey = () => `berlin-building-v3-${aerial ? "aerial" : "drawn"}`;
   return material;
 }
 
-type GroundPattern = "paving" | "asphalt" | "gravel" | "grass" | "water" | "plain";
+type GroundPattern = "paving" | "asphalt" | "gravel" | "grass" | "water" | "plain" | "aerial";
 
 const PATTERNS: Record<GroundPattern, string> = {
   plain: "",
+  // Real aerial photo. At 20 cm per pixel it is soft up close, so fine
+  // procedural grain is layered on top near the camera.
+  aerial: /* glsl */ `
+    color = aerialColor(vGroundXZ);
+    float green = smoothstep(0.02, 0.1, color.g - max(color.r, color.b));
+    // Asphalt and paving get speckle, grass gets streaky blades; both in two sizes.
+    float hard = valueNoise(vGroundXZ * 38.0) * 0.5 + valueNoise(vGroundXZ * 131.0) * 0.5;
+    float soft = valueNoise(vGroundXZ * vec2(13.0, 29.0)) * 0.55 + valueNoise(vGroundXZ * vec2(71.0, 97.0)) * 0.45;
+    float grain = mix(hard, soft, green);
+    color *= 1.0 + (grain - 0.5) * mix(0.34, 0.6, green) * detail;
+    color *= 0.97 + 0.06 * valueNoise(vGroundXZ * 3.1);
+  `,
   // Large granite slabs with joints, each slab a touch different.
   paving: /* glsl */ `
     vec2 slab = vGroundXZ * vec2(0.62, 1.05) + vec2(vGroundXZ.y * 0.04, 0.0);
@@ -250,6 +288,7 @@ interface GroundMaterialOptions {
   layer: number;
   pattern: GroundPattern;
   roughness?: number;
+  aerial?: Aerial;
 }
 
 /**
@@ -262,6 +301,7 @@ export function createGroundMaterial({
   layer,
   pattern,
   roughness = 1,
+  aerial,
 }: GroundMaterialOptions): THREE.MeshStandardMaterial {
   const material = new THREE.MeshStandardMaterial({
     vertexColors: true,
@@ -276,6 +316,8 @@ export function createGroundMaterial({
     material.onBeforeCompile = (shader) => {
       shader.uniforms.uTime = daylight.uniforms.uTime;
       shader.uniforms.uSkyHorizon = { value: daylight.horizon };
+      shader.uniforms.uAerial = { value: aerial?.texture ?? null };
+      shader.uniforms.uAerialExtent = { value: aerial?.extent ?? 1 };
       shader.vertexShader = shader.vertexShader
         .replace("#include <common>", "#include <common>\nvarying vec2 vGroundXZ;")
         .replace(
@@ -285,7 +327,7 @@ export function createGroundMaterial({
       shader.fragmentShader = shader.fragmentShader
         .replace(
           "#include <common>",
-          `#include <common>\nvarying vec2 vGroundXZ;\nuniform float uTime;\nuniform vec3 uSkyHorizon;\n${NOISE_GLSL}`,
+          `#include <common>\nvarying vec2 vGroundXZ;\nuniform float uTime;\nuniform vec3 uSkyHorizon;\n${NOISE_GLSL}\n${aerial ? AERIAL_GLSL : ""}`,
         )
         .replace(
           "#include <color_fragment>",
@@ -305,17 +347,28 @@ export function createGroundMaterial({
   return material;
 }
 
-/** Maps GLB node names to materials and draw order. */
-export function createPlaceMaterials() {
+/**
+ * Maps GLB node names to materials and draw order. With an aerial photo the
+ * ground shows the real surface and the drawn layers (green, paths, roads)
+ * are not needed; `hidden` lists them.
+ */
+export function createPlaceMaterials(aerial?: Aerial) {
+  if (aerial) {
+    aerial.texture.colorSpace = THREE.SRGBColorSpace;
+    aerial.texture.anisotropy = 8;
+    aerial.texture.needsUpdate = true;
+  }
   const materials: Record<string, THREE.Material> = {
-    ground: createGroundMaterial({ layer: 0, pattern: "paving" }),
+    ground: aerial
+      ? createGroundMaterial({ layer: 0, pattern: "aerial", aerial })
+      : createGroundMaterial({ layer: 0, pattern: "paving" }),
     layer_green: createGroundMaterial({ layer: 1, pattern: "grass" }),
     layer_water: createGroundMaterial({ layer: 2, pattern: "water", roughness: 0.15 }),
     layer_path: createGroundMaterial({ layer: 3, pattern: "gravel" }),
     layer_curb: createGroundMaterial({ layer: 4, pattern: "gravel" }),
     layer_road: createGroundMaterial({ layer: 5, pattern: "asphalt", roughness: 0.92 }),
     layer_marking: createGroundMaterial({ layer: 6, pattern: "plain" }),
-    buildings: createBuildingMaterial(),
+    buildings: createBuildingMaterial(aerial),
   };
   const renderOrder: Record<string, number> = {
     ground: -8,
@@ -326,5 +379,8 @@ export function createPlaceMaterials() {
     layer_road: -3,
     layer_marking: -2,
   };
-  return { materials, renderOrder };
+  const hidden = aerial
+    ? ["layer_green", "layer_water", "layer_path", "layer_curb", "layer_road", "layer_marking"]
+    : [];
+  return { materials, renderOrder, hidden };
 }

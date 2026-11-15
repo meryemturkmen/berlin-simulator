@@ -56,5 +56,11 @@ describe.each(PLACES)("place $id", (place) => {
     expect(manifest.halfSize).toBe(place.halfSize);
     expect(manifest.stats.buildings).toBeGreaterThan(10);
     expect(manifest.stats.glbBytes).toBe(statSync(glb).size);
+
+    // Aerial ground photo, kept small enough for a quick first load.
+    expect(manifest.aerial).toBe(true);
+    const photo = join(ASSETS, `${place.id}-ground.jpg`);
+    expect(existsSync(photo)).toBe(true);
+    expect(statSync(photo).size).toBeLessThan(1_500_000);
   });
 });

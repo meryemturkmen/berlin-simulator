@@ -104,3 +104,11 @@ On request the look moved from pastel toy town toward a more realistic city, sti
 - Trees: branching trunks and smooth, lumpy foliage clumps with a 3D leaf-noise shader instead of faceted blobs.
 - Sky: horizon haze and procedural drifting clouds in the dome shader instead of low-poly cloud meshes.
 - Characters: adult proportions (smaller head, longer limbs, shoulders, nose) for player, NPCs and pedestrians.
+
+## D25: Photographic ground and roofs from open aerial imagery
+
+Mer asked for a look close to street-level photography and chose to stay with open Berlin data (no Google or Mapillary account). The pipeline now downloads the 2024 true orthophoto (20 cm per pixel, dl-de/zero-2-0) for each place. It is mapped top-down onto the ground, replacing the drawn green, path and road layers, and onto roof faces. Fine procedural grain covers the softness of the photo near the camera. Facades stay procedural because no open facade photos could be fetched.
+
+## D26: Berlin 3D mesh (pending)
+
+Berlin publishes a photogrammetric, photo-textured 3D mesh from a June 2025 flight through the "Berlin 3D Downloadportal" (businesslocationcenter.de, OBJ tiles). That would give real facades as well. On 2026-11-15 the portal answered with a maintenance notice, so neither the tile URLs nor the terms of use could be checked. Next step once it is back: read the terms, script the tile download for the three places, decimate and compress the mesh, and replace LoD2 buildings where the mesh is good enough.
